@@ -15,7 +15,8 @@ const AddProductForm = ({ onSuccess }) => {
         arrivalDate: '',
         supplier: '',
         warehouse: '',
-        image_path: null
+        fileName: '',
+        image: null
     });
 
     const handleChange = (event) => {
@@ -25,7 +26,10 @@ const AddProductForm = ({ onSuccess }) => {
 
     const handleImageChange = (event) => {
         const file = event.target.files[0];
-        setFormValues({ ...formValues, image: file });
+        setFormValues({ ...formValues,
+            fileName: file ? file.name : '',
+            image: file
+        });
     };
 
     const handleSubmit = async (event) => {
@@ -44,6 +48,7 @@ const AddProductForm = ({ onSuccess }) => {
             formData.append('arrivalDate', formValues.arrivalDate);
             formData.append('supplier', formValues.supplier);
             formData.append('warehouse', formValues.warehouse);
+            formData.append('fileName', formValues.fileName);
             formData.append('image', formValues.image);
 
             const response = await axios.post('api/warehouse/items/add', formData, {

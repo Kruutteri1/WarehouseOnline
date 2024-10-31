@@ -7,11 +7,13 @@ import org.example.warehouseonline.service.WarehouseOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -27,7 +29,6 @@ public class WarehouseOrdersServiceImpl implements WarehouseOrdersService {
     public WarehouseOrdersServiceImpl(WarehouseOrdersRepository warehouseOrdersRepository) {
         this.warehouseOrdersRepository = warehouseOrdersRepository;
     }
-
 
     @Override
     public List<WarehouseOrders> getFilteredOrders(String warehouse, String category, String filter) {
@@ -54,17 +55,26 @@ public class WarehouseOrdersServiceImpl implements WarehouseOrdersService {
     }
 
     @Override
-    public WarehouseOrders addItem(String order_id, String name, int quantity, double total_amount, String category, String OrderDate, String delivery_date, String warehouse, String order_status, MultipartFile image) {
-        // Оригинальное имя файла
-        String originalFilename = image.getOriginalFilename();
+    public ResponseEntity<byte[]> getOrderImage(Long id) {
+        Optional<WarehouseOrders> itemOptional = warehouseOrdersRepository.findById(id);
+        if (itemOptional.isPresent()) {
+            WarehouseOrders order = itemOptional.get();
+            byte[] imageData = order.getImage();
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_JPEG)
+                    .body(imageData);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
-        // Сохраняем изображение в указанную папку с оригинальным именем
-        String uploadDir = "D:\\IdeaProjects\\WarehouseOnline\\src\\main\\resources\\static\\images\\orders";
-        File dest = new File(uploadDir + "/" + originalFilename);
+    @Override
+    public WarehouseOrders addOrder(String order_id, String name, int quantity, double total_amount, String category, String OrderDate, String delivery_date, String warehouse, String order_status, String fileName,MultipartFile image) {
+        byte[] imageData;
         try {
-            image.transferTo(dest);
+            imageData = image.getBytes();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error reading an image", e);
         }
 
         // Создаем новый объект WareHouseOrder с полученными данными
@@ -85,7 +95,8 @@ public class WarehouseOrdersServiceImpl implements WarehouseOrdersService {
 
         newOrder.setWarehouse(warehouse);
         newOrder.setOrder_status(order_status);
-        newOrder.setImagePath("/images/products/" + originalFilename); // Устанавливаем путь к изображению с оригинальным именем
+        newOrder.setFileName(fileName);
+        newOrder.setImage(imageData);
 
         return warehouseOrdersRepository.save(newOrder);
     }
@@ -107,7 +118,6 @@ public class WarehouseOrdersServiceImpl implements WarehouseOrdersService {
         order.setTotal_amount((int) total_amount);
         order.setCategory(category);
 
-
         // Форматтер для даты прибытия
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate parsedOrderDate = LocalDate.parse(orderDate, dateFormatter);
@@ -123,7 +133,14 @@ public class WarehouseOrdersServiceImpl implements WarehouseOrdersService {
     }
 
     @Override
-    public void deleteOrderById(Integer orderId) {
-        warehouseOrdersRepository.deleteById((long) orderId);
+    public ResponseEntity<String> deleteOrderById(Integer orderId) {
+        Optional<WarehouseOrders> order = warehouseOrdersRepository.findById(orderId);
+
+        if (order.isPresent()) {
+            warehouseOrdersRepository.deleteById((long) orderId);
+            return new ResponseEntity<>("Order with ID: " + orderId + " has been deleted", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Order with ID: " + orderId + " not found", HttpStatus.NOT_FOUND);
+        }
     }
 }

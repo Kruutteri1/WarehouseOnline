@@ -17,7 +17,8 @@ const AddOrderForm = ({ onSuccess }) => {
         order_status: '',
         warehouse: '',
         delivery_date: '',
-        image_path: null
+        fileName: '',
+        image: null
     });
 
     const handleChange = (event) => {
@@ -27,7 +28,9 @@ const AddOrderForm = ({ onSuccess }) => {
 
     const handleImageChange = (event) => {
         const file = event.target.files[0];
-        setFormValues({ ...formValues, image: file });
+        setFormValues({ ...formValues,
+            fileName: file ? file.name : '',
+            image: file });
     };
 
     const handleSubmit = async (event) => {
@@ -48,6 +51,7 @@ const AddOrderForm = ({ onSuccess }) => {
             formData.append('warehouse', formValues.warehouse);
             formData.append('delivery_date', formValues.delivery_date);
             formData.append('order_status', formValues.order_status);
+            formData.append('fileName', formValues.fileName);
             formData.append('image', formValues.image);
 
             const response = await axios.post('http://localhost:5000/api/warehouse/orders/add', formData, {
@@ -59,6 +63,8 @@ const AddOrderForm = ({ onSuccess }) => {
 
             if (response.status === 200) {
                 onSuccess();
+                console.log('file_name:', formValues.fileName);
+                console.log('image:', formValues.image);
             } else {
                 console.error('Request failed with status:', response.status);
             }

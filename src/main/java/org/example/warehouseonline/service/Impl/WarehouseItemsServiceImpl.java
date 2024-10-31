@@ -7,11 +7,13 @@ import org.example.warehouseonline.service.WarehouseItemsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -55,17 +57,12 @@ public class WarehouseItemsServiceImpl implements WarehouseItemsService {
     }
 
     @Override
-    public WareHouseItems addItem(String order_id, String name, int quantity, double price, String category, String arrivalDate, String supplier, String warehouse, MultipartFile image) {
-        // Оригінальне ім'я файлу
-        String originalFilename = image.getOriginalFilename();
-
-        // Зберігаємо зображення в зазначену папку з оригінальним ім'ям
-        String uploadDir = "D:\\IdeaProjects\\WarehouseOnline\\src\\main\\resources\\static\\images\\products";
-        File dest = new File(uploadDir + "/" + originalFilename);
+    public WareHouseItems addItem(String order_id, String name, int quantity, double price, String category, String arrivalDate, String supplier, String warehouse, String fileName, MultipartFile image) {
+        byte[] imageData;
         try {
-            image.transferTo(dest);
+            imageData = image.getBytes();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error reading an image", e);
         }
 
         // Створюємо новий об'єкт WareHouseItems з отриманими даними
@@ -87,9 +84,25 @@ public class WarehouseItemsServiceImpl implements WarehouseItemsService {
 
         newItem.setSupplier(supplier);
         newItem.setWarehouse(warehouse);
-        newItem.setImagePath("/images/products/" + originalFilename); // Встановлюємо шлях до зображення з оригінальним ім'ям
+
+        newItem.setFileName(fileName);
+        newItem.setImage(imageData);
 
         return warehouseItemsRepository.save(newItem);
+    }
+
+    @Override
+    public ResponseEntity<byte[]> getImage(Long id) {
+        Optional<WareHouseItems> itemOptional = warehouseItemsRepository.findById(id);
+        if (itemOptional.isPresent()) {
+            WareHouseItems item = itemOptional.get();
+            byte[] imageData = item.getImage();
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_JPEG)
+                    .body(imageData);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @Override
@@ -125,7 +138,14 @@ public class WarehouseItemsServiceImpl implements WarehouseItemsService {
     }
 
     @Override
-    public void deleteProductById(Integer productId) {
-        warehouseItemsRepository.deleteById((long) productId);
+    public ResponseEntity<String> deleteProductById(Integer productId) {
+        Optional<WareHouseItems> product = warehouseItemsRepository.findById((long) productId);
+
+        if (product.isPresent()) {
+            warehouseItemsRepository.deleteById((long) productId);
+            return new ResponseEntity<>("Product with ID: " + productId + " has been deleted", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Product with ID: " + productId + " not found", HttpStatus.NOT_FOUND);
+        }
     }
 }

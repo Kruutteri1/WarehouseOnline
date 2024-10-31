@@ -138,7 +138,7 @@ const Warehouse = () => {
             });
 
             if (response.status === 200) {
-                console.log(`Product with ID ${productId} has been successfully deleted.`);
+                console.log(response.data);
                 setProducts(prevOrders => prevOrders.filter(product => product.id !== productId));
             } else {
                 console.error('Request failed with status:', response.status);
@@ -198,8 +198,8 @@ const Warehouse = () => {
                 {products.map(product => (
                     <div key={product.id} className="product-grid">
                         <ImageLoader
-                            imagePath={product.imagePath.substring(product.imagePath.lastIndexOf('/') + 1)}
-                            alt={product.name}
+                            imageId={product.id}
+                            alt={product.fileName}
                             actualToken={actualToken}
                             onImageLoad={handleImageLoad}
                         />

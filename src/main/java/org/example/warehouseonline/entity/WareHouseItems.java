@@ -24,10 +24,11 @@ public class WareHouseItems {
     //Код товара (SKU): Уникальный идентификатор товара, который помогает однозначно идентифицировать каждый товар.
     private String sku;
 
-    // Путь к изображению
-    private String imagePath;
-
     private String name;
+
+    private String fileName;
+
+    private byte[] image;
 
     private Integer price;
 

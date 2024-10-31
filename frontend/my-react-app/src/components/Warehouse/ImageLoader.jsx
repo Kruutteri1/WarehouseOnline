@@ -1,13 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 
-const ImageLoader = ({ imagePath, alt, actualToken, onImageLoad }) => {
+const ImageLoader = ({ imageId, alt, actualToken, onImageLoad }) => {
     const [image, setImage] = useState(null);
     const [response, setResponse] = useState(null);
 
     const fetchImage =  () => {
 
-        axios.get(`api/warehouse/items/images/${encodeURIComponent(imagePath)}`, {
+        axios.get(`api/warehouse/items/image/${imageId}`, {
             headers: {
                 Authorization: `Bearer ${actualToken}`
             },
@@ -27,7 +27,7 @@ const ImageLoader = ({ imagePath, alt, actualToken, onImageLoad }) => {
 
 
         fetchImage();
-    }, [imagePath, actualToken]);
+    }, [imageId, actualToken]);
 
     return <img className="product-image" src={image} alt={alt} />;
 };

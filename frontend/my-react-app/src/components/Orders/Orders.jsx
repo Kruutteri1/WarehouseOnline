@@ -200,8 +200,8 @@ const Order = () => {
                 {orders.map(order => (
                     <div key={order.id} className="order-grid">
                         <ImageLoaderOrders
-                            imagePath={order.imagePath.substring(order.imagePath.lastIndexOf('/') + 1)}
-                            alt={order.name}
+                            imageId={order.id}
+                            alt={order.fileName}
                             actualToken={actualToken}
                             onImageLoad={handleImageLoad}
                         />

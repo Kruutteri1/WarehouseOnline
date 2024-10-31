@@ -23,7 +23,9 @@ public class WarehouseOrders {
     private String order_id;
 
     // Путь к изображению
-    private String imagePath;
+    private byte[] image;
+
+    private String fileName;
 
     private String name;
 
@@ -44,5 +46,4 @@ public class WarehouseOrders {
     private LocalDate delivery_date;
 
     private String order_status;
-
 }
