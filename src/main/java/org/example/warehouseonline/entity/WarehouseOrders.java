@@ -20,9 +20,8 @@ public class WarehouseOrders {
     private Integer id;
 
     //Уникальный идентификатор заказа, который помогает однозначно идентифицировать каждый товар.
-    private String order_id;
+    private String orderId;
 
-    // Путь к изображению
     private byte[] image;
 
     private String fileName;
@@ -31,19 +30,17 @@ public class WarehouseOrders {
 
     private Integer quantity;
 
-    private Integer total_amount;
+    private double totalAmount;
 
-    //Категория товара:
     private String category;
 
-    //Склад
     private String warehouse;
 
     //Дата размещения заказа.
     private LocalDate OrderDate;
 
     //Планируемая дата доставки заказа.
-    private LocalDate delivery_date;
+    private LocalDate deliveryDate;
 
-    private String order_status;
+    private String orderStatus;
 }

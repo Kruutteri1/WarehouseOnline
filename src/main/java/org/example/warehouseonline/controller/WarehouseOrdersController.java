@@ -5,7 +5,6 @@ import org.example.warehouseonline.entity.WarehouseOrders;
 import org.example.warehouseonline.service.Impl.WarehouseOrdersServiceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,33 +38,33 @@ public class WarehouseOrdersController {
 
     @PostMapping("/add")
     @CrossOrigin(origins = "http://localhost:3000")
-    public WarehouseOrders addOrder(@RequestParam("order_id") String order_id,
+    public WarehouseOrders addOrder(@RequestParam("orderId") String orderId,
                                   @RequestParam("name") String name,
                                   @RequestParam("quantity") int quantity,
-                                  @RequestParam("total_amount") double total_amount,
+                                  @RequestParam("totalAmount") double totalAmount,
                                   @RequestParam("category") String category,
                                   @RequestParam("orderDate") String OrderDate,
-                                  @RequestParam("delivery_date") String delivery_date,
+                                  @RequestParam("deliveryDate") String deliveryDate,
                                   @RequestParam("warehouse") String warehouse,
                                   @RequestParam("fileName") String fileName,
-                                  @RequestParam("order_status") String order_status,
+                                  @RequestParam("orderStatus") String orderStatus,
                                   @RequestParam("image") MultipartFile image) {
-        return warehouseOrdersService.addOrder(order_id, name, quantity, total_amount, category, OrderDate, delivery_date, warehouse, order_status, fileName, image);
+        return warehouseOrdersService.addOrder(orderId, name, quantity, totalAmount, category, OrderDate, deliveryDate, warehouse, orderStatus, fileName, image);
     }
 
     @PostMapping("/update")
-    //@CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin(origins = "http://localhost:3000")
     public WarehouseOrders updateOrder(@RequestParam("id") String id,
-                                     @RequestParam("order_id") String order_id,
+                                     @RequestParam("orderId") String orderId,
                                      @RequestParam("name") String name,
                                      @RequestParam("quantity") int quantity,
-                                     @RequestParam("total_amount") double total_amount,
+                                     @RequestParam("totalAmount") double totalAmount,
                                      @RequestParam("category") String category,
                                      @RequestParam("orderDate") String orderDate,
-                                     @RequestParam("delivery_date") String delivery_date,
-                                      @RequestParam("order_status") String order_status,
+                                     @RequestParam("deliveryDate") String deliveryDate,
+                                      @RequestParam("orderStatus") String orderStatus,
                                      @RequestParam("warehouse") String warehouse) {
-        return warehouseOrdersService.updateOrder(id, order_id, name, quantity, total_amount, category, orderDate, delivery_date, order_status, warehouse);
+        return warehouseOrdersService.updateOrder(id, orderId, name, quantity, totalAmount, category, orderDate, deliveryDate, orderStatus, warehouse);
     }
 
     @DeleteMapping("/delete/{orderId}")

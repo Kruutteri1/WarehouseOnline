@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { getCookie } from '../../Token/Token';
+import './AddProductForm.css';
 
 const AddProductForm = ({ onSuccess }) => {
     const categories = ['Electronics', 'Clothing', 'Books', "Home Decor", "Sports & Outdoors"];
@@ -54,7 +55,7 @@ const AddProductForm = ({ onSuccess }) => {
             const response = await axios.post('api/warehouse/items/add', formData, {
                 headers: {
                     Authorization: `Bearer ${actualToken}`,
-                    'Content-Type': 'multipart/form-data' // Указываем тип контента как multipart/form-data
+                    'Content-Type': 'multipart/form-data'
                 },
             });
 

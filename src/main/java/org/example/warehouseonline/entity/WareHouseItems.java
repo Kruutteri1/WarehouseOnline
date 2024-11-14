@@ -30,7 +30,7 @@ public class WareHouseItems {
 
     private byte[] image;
 
-    private Integer price;
+    private double price;
 
     private Integer quantity;
 

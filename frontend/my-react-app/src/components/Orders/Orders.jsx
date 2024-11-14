@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import './Orders.css';
 import { getCookie } from "../../Token/Token"
 import axios from "axios";
-import AddOrderForm from "./AddOrderForm";
 import EditableField from "../Warehouse/EditableField";
-import ImageLoaderOrders from "./ImageLoaderOrders";
+import ImageLoaderOrders from "../Warehouse/ImageLoader";
+import {Link} from "react-router-dom";
 
 const warehouses = ['Main Warehouse', 'Warehouse B', 'Warehouse C'];
 const categories = ['Electronics', 'Clothing', 'Books', "Home Decor", "Sports & Outdoors"];
@@ -15,11 +15,9 @@ const Order = () => {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [filter, setFilter] = useState('');
     const [orders, setOrders] = useState([]);
-    const [showAddOrderForm, setShowAddOrderForm] = useState(false);
     const [image, setImage] = useState(null);
     const [editingOrderId, setEditingOrderId] = useState(null);
-    const [updatedOrder, setUpdatedOrder] = useState([]); // Определение переменной updatedProducts
-
+    const [updatedOrder, setUpdatedOrder] = useState([]);
 
     const jwtToken = getCookie('jwtToken');
     const tokenObject = JSON.parse(jwtToken);
@@ -55,10 +53,6 @@ const Order = () => {
 
     const handleImageLoad = (data) => {
         setImage(data);
-    };
-
-    const handleShowAddOrderForm = () => {
-        setShowAddOrderForm(true);
     };
 
     const handleWarehouseChange = (event) => {
@@ -105,15 +99,15 @@ const Order = () => {
         try {
             const formDataUpdateOrder = new FormData();
             formDataUpdateOrder.append('id', updatedOrder.id);
-            formDataUpdateOrder.append('order_id', updatedOrder.order_id);
+            formDataUpdateOrder.append('orderId', updatedOrder.orderId);
             formDataUpdateOrder.append('name', updatedOrder.name);
             formDataUpdateOrder.append('quantity', updatedOrder.quantity);
-            formDataUpdateOrder.append('total_amount', updatedOrder.total_amount);
+            formDataUpdateOrder.append('totalAmount', updatedOrder.totalAmount);
             formDataUpdateOrder.append('category', updatedOrder.category);
             formDataUpdateOrder.append('orderDate', updatedOrder.orderDate);
             formDataUpdateOrder.append('warehouse', updatedOrder.warehouse);
-            formDataUpdateOrder.append('delivery_date', updatedOrder.delivery_date);
-            formDataUpdateOrder.append('order_status', updatedOrder.order_status);
+            formDataUpdateOrder.append('deliveryDate', updatedOrder.deliveryDate);
+            formDataUpdateOrder.append('orderStatus', updatedOrder.orderStatus);
 
             const response = await axios.post('http://localhost:5000/api/warehouse/orders/update', formDataUpdateOrder, {
                 headers: {
@@ -178,7 +172,9 @@ const Order = () => {
 
                     <label>Filter:</label>
                     <input type="text" value={filter} onChange={handleFilterChange}/>
-                    <button onClick={handleShowAddOrderForm}>Add Order</button>
+                    <Link to="/add-order">
+                        <button className="add-order-button">Add Order</button>
+                    </Link>
                 </div>
             </header>
 
@@ -196,7 +192,6 @@ const Order = () => {
             </div>
 
             <div className="order-container">
-                {showAddOrderForm && <AddOrderForm onSuccess={() => setShowAddOrderForm(false)}/>}
                 {orders.map(order => (
                     <div key={order.id} className="order-grid">
                         <ImageLoaderOrders
@@ -208,8 +203,8 @@ const Order = () => {
                         {editingOrderId === order.id ? (
                             <>
                                 <EditableField
-                                    value={order.order_id}
-                                    onChange={(newValue) => handleSaveOrderChanges(order.id, 'order_id', newValue)}
+                                    value={order.orderId}
+                                    onChange={(newValue) => handleSaveOrderChanges(order.id, 'orderId', newValue)}
                                     className="order-info2"
                                 />
                                 <EditableField
@@ -223,8 +218,8 @@ const Order = () => {
                                     className="order-info2"
                                 />
                                 <EditableField
-                                    value={order.total_amount}
-                                    onChange={(newValue) => handleSaveOrderChanges(order.id, 'total_amount', newValue)}
+                                    value={order.totalAmount}
+                                    onChange={(newValue) => handleSaveOrderChanges(order.id, 'totalAmount', newValue)}
                                     className="order-info2"
                                 />
                                 <select
@@ -259,14 +254,14 @@ const Order = () => {
                                 </select>
                                 <input
                                     type="date"
-                                    value={order.delivery_date.substring(0, 10)}
-                                    onChange={(e) => handleSaveOrderChanges(order.id, 'delivery_date', e.target.value)}
+                                    value={order.deliveryDate.substring(0, 10)}
+                                    onChange={(e) => handleSaveOrderChanges(order.id, 'deliveryDate', e.target.value)}
                                     className="order-info2"
                                 />
                                 <select
                                     className="order-info2"
-                                    value={order.order_status}
-                                    onChange={(e) => handleSaveOrderChanges(order.id, 'order_status', e.target.value)}
+                                    value={order.orderStatus}
+                                    onChange={(e) => handleSaveOrderChanges(order.id, 'orderStatus', e.target.value)}
                                 >
                                     <option value="">Select Status</option>
                                     {statuses.map((status, index) => (
@@ -279,28 +274,30 @@ const Order = () => {
                             </>
                         ) : (
                             <>
-                                <div className="order-info2">{order.order_id}</div>
+                                <div className="order-info2">{order.orderId}</div>
                                 <div className="order-info2">{order.name}</div>
                                 <div className="order-info2">{order.quantity}</div>
-                                <div className="order-info2">{order.total_amount}</div>
+                                <div className="order-info2">{order.totalAmount}</div>
                                 <div className="order-info2">{order.category}</div>
                                 <div className="order-info2">{order.orderDate}</div>
                                 <div className="order-info2">{order.warehouse}</div>
-                                <div className="order-info2">{order.delivery_date}</div>
-                                <div className="order-info2">{order.order_status}</div>
+                                <div className="order-info2">{order.deliveryDate}</div>
+                                <div className="order-info2">{order.orderStatus}</div>
                             </>
                         )}
 
                         <div className="order-info2">
                             {editingOrderId === order.id ? (
                                 <>
-                                    <button onClick={() => handleSaveUpdatedOrder()}>Save</button>
+                                    <button className="save-button" onClick={() => handleSaveUpdatedOrder()}>Save</button>
                                 </>
                             ) : (
-                                <button onClick={() => handleEditOrder(order.id)}>Edit</button>
+                                <button className="edit-button" onClick={() => handleEditOrder(order.id)}>Edit</button>
                             )}
                         </div>
-                        <button className="order-info2" onClick={() => handleDeleteOrder(order.id)}>Delete</button>
+                        <div className="order-info2">
+                            <button className="delete-button" onClick={() => handleDeleteOrder(order.id)}>Delete</button>
+                        </div>
                     </div>
                 ))}
             </div>

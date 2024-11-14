@@ -11,9 +11,9 @@ public interface WarehouseOrdersService {
 
     ResponseEntity<byte[]> getOrderImage(Long id);
 
-    WarehouseOrders addOrder(String order_id, String name, int quantity, double total_amount, String category, String OrderDate, String delivery_date, String warehouse, String order_status, String fileName, MultipartFile image);
+    WarehouseOrders addOrder(String orderId, String name, int quantity, double totalAmount, String category, String OrderDate, String deliveryDate, String warehouse, String orderStatus, String fileName, MultipartFile image);
 
-    WarehouseOrders updateOrder(String id, String order_id, String name, int quantity, double total_amount, String category, String orderDate, String delivery_date, String order_status, String warehouse);
+    WarehouseOrders updateOrder(String id, String orderId, String name, int quantity, double totalAmount, String category, String orderDate, String deliveryDate, String orderStatus, String warehouse);
 
     ResponseEntity<String> deleteOrderById(Integer productId);
 }

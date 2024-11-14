@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import './Warehouse.css';
 import { getCookie } from "../../Token/Token"
 import axios from "axios";
-import AddProductForm from "./AddProductForm";
 import ImageLoader from "./ImageLoader";
 import EditableField from "./EditableField";
+import {Link} from "react-router-dom";
 
 const warehouses = ['Main Warehouse', 'Warehouse B', 'Warehouse C'];
 const categories = ['Electronics', 'Clothing', 'Books', "Home Decor", "Sports & Outdoors"];
@@ -14,11 +14,9 @@ const Warehouse = () => {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [filter, setFilter] = useState('');
     const [products, setProducts] = useState([]);
-    const [showAddProductForm, setShowAddProductForm] = useState(false);
     const [image, setImage] = useState(null);
     const [editingProductId, setEditingProductId] = useState(null);
     const [updatedProduct, setUpdatedProduct] = useState([]); // Определение переменной updatedProducts
-
 
     const jwtToken = getCookie('jwtToken');
     const tokenObject = JSON.parse(jwtToken);
@@ -53,10 +51,6 @@ const Warehouse = () => {
 
     const handleImageLoad = (data) => {
         setImage(data);
-    };
-
-    const handleShowAddProductForm = () => {
-        setShowAddProductForm(true);
     };
 
     const handleWarehouseChange = (event) => {
@@ -148,7 +142,6 @@ const Warehouse = () => {
         }
     };
 
-
     return (
         <div>
             <header>
@@ -176,7 +169,9 @@ const Warehouse = () => {
 
                     <label>Filter:</label>
                     <input type="text" value={filter} onChange={handleFilterChange}/>
-                    <button onClick={handleShowAddProductForm}>Add Product</button>
+                    <Link to="/add-product">
+                        <button className="add-product-button">Add Product</button>
+                    </Link>
                 </div>
             </header>
 
@@ -194,7 +189,6 @@ const Warehouse = () => {
             </div>
 
             <div className="product-container">
-                {showAddProductForm && <AddProductForm onSuccess={() => setShowAddProductForm(false)}/>}
                 {products.map(product => (
                     <div key={product.id} className="product-grid">
                         <ImageLoader
@@ -280,13 +274,17 @@ const Warehouse = () => {
                         <div className="product-info2">
                             {editingProductId === product.id ? (
                                 <>
-                                    <button onClick={() => handleSaveUpdatedProduct()}>Save</button>
+                                    <button className="save-button" onClick={() => handleSaveUpdatedProduct()}>Save
+                                    </button>
                                 </>
                             ) : (
-                                <button onClick={() => handleEditProduct(product.id)}>Edit</button>
+                                <button className="edit-button"
+                                        onClick={() => handleEditProduct(product.id)}>Edit</button>
                             )}
                         </div>
-                        <button className="product-info2" onClick={() => handleDeleteProduct(product.id)}>Delete</button>
+                        <div className="product-info2">
+                            <button className="delete-button" onClick={() => handleDeleteProduct(product.id)}>Delete</button>
+                        </div>
                     </div>
                 ))}
             </div>

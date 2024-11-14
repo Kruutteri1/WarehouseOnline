@@ -45,7 +45,8 @@ public class WarehouseItemsServiceImpl implements WarehouseItemsService {
             ExampleMatcher matcher = ExampleMatcher.matching()
                     .withMatcher("warehouse", ExampleMatcher.GenericPropertyMatchers.ignoreCase())
                     .withMatcher("category", ExampleMatcher.GenericPropertyMatchers.ignoreCase())
-                    .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
+                    .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
+                    .withIgnorePaths("price");
 
             Example<WareHouseItems> example = Example.of(exampleItem, matcher);
 
@@ -57,7 +58,7 @@ public class WarehouseItemsServiceImpl implements WarehouseItemsService {
     }
 
     @Override
-    public WareHouseItems addItem(String order_id, String name, int quantity, double price, String category, String arrivalDate, String supplier, String warehouse, String fileName, MultipartFile image) {
+    public WareHouseItems addItem(String sku, String name, int quantity, double price, String category, String arrivalDate, String supplier, String warehouse, String fileName, MultipartFile image) {
         byte[] imageData;
         try {
             imageData = image.getBytes();
@@ -65,26 +66,21 @@ public class WarehouseItemsServiceImpl implements WarehouseItemsService {
             throw new RuntimeException("Error reading an image", e);
         }
 
-        // Створюємо новий об'єкт WareHouseItems з отриманими даними
         WareHouseItems newItem = new WareHouseItems();
-        newItem.setSku(order_id);
+        newItem.setSku(sku);
         newItem.setName(name);
         newItem.setQuantity(quantity);
         newItem.setPrice((int) price);
         newItem.setCategory(category);
 
-        // Форматтер для дати прибуття
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate parsedArrivalDate = LocalDate.parse(arrivalDate, dateFormatter);
         newItem.setArrivalDate(parsedArrivalDate);
-
-        // Встановлюємо поточний час
         LocalDateTime currentDateTime = LocalDateTime.now();
         newItem.setLastUpdated(currentDateTime);
 
         newItem.setSupplier(supplier);
         newItem.setWarehouse(warehouse);
-
         newItem.setFileName(fileName);
         newItem.setImage(imageData);
 
@@ -106,28 +102,20 @@ public class WarehouseItemsServiceImpl implements WarehouseItemsService {
     }
 
     @Override
-    public WareHouseItems updateItem(String id, String order_id, String name, int quantity, double price, String category, String arrivalDate, String supplier, String warehouse) {
-        // Знайти товар у базі даних за його ідентифікатором
+    public WareHouseItems updateItem(String id, String sku, String name, int quantity, double price, String category, String arrivalDate, String supplier, String warehouse) {
         Optional<WareHouseItems> optionalItem = warehouseItemsRepository.findById(Long.parseLong(id));
-        if (optionalItem.isEmpty()) {
-            throw new RuntimeException("Item not found with id: " + id);
-        }
+        if (optionalItem.isEmpty()) throw new RuntimeException("Item not found with id: " + id);
 
         WareHouseItems item = optionalItem.get();
-
-        // Оновити поля товару на основі отриманих даних
-        item.setSku(order_id);
+        item.setSku(sku);
         item.setName(name);
         item.setQuantity(quantity);
         item.setPrice((int) price);
         item.setCategory(category);
 
-        // Форматтер для дати прибуття
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate parsedArrivalDate = LocalDate.parse(arrivalDate, dateFormatter);
         item.setArrivalDate(parsedArrivalDate);
-
-        // Встановлюємо поточний час
         LocalDateTime currentDateTime = LocalDateTime.now();
         item.setLastUpdated(currentDateTime);
 
@@ -139,6 +127,7 @@ public class WarehouseItemsServiceImpl implements WarehouseItemsService {
 
     @Override
     public ResponseEntity<String> deleteProductById(Integer productId) {
+        if (productId < 0) return new ResponseEntity<>("Invalid product ID: must be a positive integer", HttpStatus.BAD_REQUEST);
         Optional<WareHouseItems> product = warehouseItemsRepository.findById((long) productId);
 
         if (product.isPresent()) {

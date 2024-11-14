@@ -69,7 +69,7 @@ public class WarehouseOrdersServiceImpl implements WarehouseOrdersService {
     }
 
     @Override
-    public WarehouseOrders addOrder(String order_id, String name, int quantity, double total_amount, String category, String OrderDate, String delivery_date, String warehouse, String order_status, String fileName,MultipartFile image) {
+    public WarehouseOrders addOrder(String orderId, String name, int quantity, double totalAmount, String category, String OrderDate, String deliveryDate, String warehouse, String orderStatus, String fileName, MultipartFile image) {
         byte[] imageData;
         try {
             imageData = image.getBytes();
@@ -77,24 +77,22 @@ public class WarehouseOrdersServiceImpl implements WarehouseOrdersService {
             throw new RuntimeException("Error reading an image", e);
         }
 
-        // Создаем новый объект WareHouseOrder с полученными данными
         WarehouseOrders newOrder = new WarehouseOrders();
-        newOrder.setOrder_id(order_id);
+        newOrder.setOrderId(orderId);
         newOrder.setName(name);
         newOrder.setQuantity(quantity);
-        newOrder.setTotal_amount((int) total_amount);
+        newOrder.setTotalAmount((int) totalAmount);
         newOrder.setCategory(category);
 
-        // Форматтер для даты
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate parsedOrderDate = LocalDate.parse(OrderDate, dateFormatter);
         newOrder.setOrderDate(parsedOrderDate);
 
-        LocalDate parsedDeliveryDate = LocalDate.parse(delivery_date, dateFormatter);
-        newOrder.setDelivery_date(parsedDeliveryDate);
+        LocalDate parsedDeliveryDate = LocalDate.parse(deliveryDate, dateFormatter);
+        newOrder.setDeliveryDate(parsedDeliveryDate);
 
         newOrder.setWarehouse(warehouse);
-        newOrder.setOrder_status(order_status);
+        newOrder.setOrderStatus(orderStatus);
         newOrder.setFileName(fileName);
         newOrder.setImage(imageData);
 
@@ -102,39 +100,33 @@ public class WarehouseOrdersServiceImpl implements WarehouseOrdersService {
     }
 
     @Override
-    public WarehouseOrders updateOrder(String id, String order_id, String name, int quantity, double total_amount, String category, String orderDate, String delivery_date, String order_status, String warehouse) {
-        // Найти товар в базе данных по его идентификатору
+    public WarehouseOrders updateOrder(String id, String orderId, String name, int quantity, double totalAmount, String category, String orderDate, String deliveryDate, String orderStatus, String warehouse) {
         Optional<WarehouseOrders> optionalItem = warehouseOrdersRepository.findById(Long.parseLong(id));
-        if (optionalItem.isEmpty()) {
-            throw new RuntimeException("Item not found with id: " + id);
-        }
+        if (optionalItem.isEmpty()) throw new RuntimeException("Item not found with id: " + id);
 
         WarehouseOrders order = optionalItem.get();
-
-        // Обновить поля товара на основе полученных данных
-        order.setOrder_id(order_id);
+        order.setOrderId(orderId);
         order.setName(name);
         order.setQuantity(quantity);
-        order.setTotal_amount((int) total_amount);
+        order.setTotalAmount((int) totalAmount);
         order.setCategory(category);
 
-        // Форматтер для даты прибытия
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate parsedOrderDate = LocalDate.parse(orderDate, dateFormatter);
         order.setOrderDate(parsedOrderDate);
-
-        LocalDate parsedDelivery_date = LocalDate.parse(delivery_date, dateFormatter);
-        order.setDelivery_date(parsedDelivery_date);;
+        LocalDate parsedDelivery_date = LocalDate.parse(deliveryDate, dateFormatter);
+        order.setDeliveryDate(parsedDelivery_date);;
 
         order.setWarehouse(warehouse);
-        order.setOrder_status(order_status);
+        order.setOrderStatus(orderStatus);
 
         return warehouseOrdersRepository.save(order);
     }
 
     @Override
     public ResponseEntity<String> deleteOrderById(Integer orderId) {
-        Optional<WarehouseOrders> order = warehouseOrdersRepository.findById(orderId);
+        if (orderId < 0) return new ResponseEntity<>("Invalid order ID: must be a positive integer", HttpStatus.BAD_REQUEST);
+        Optional<WarehouseOrders> order = warehouseOrdersRepository.findById((long) orderId);
 
         if (order.isPresent()) {
             warehouseOrdersRepository.deleteById((long) orderId);

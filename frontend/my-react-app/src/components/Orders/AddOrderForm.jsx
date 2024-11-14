@@ -41,16 +41,16 @@ const AddOrderForm = ({ onSuccess }) => {
             const actualToken = tokenObject.token;
 
             const formData = new FormData();
-            formData.append('order_id', formValues.order_id);
+            formData.append('orderId', formValues.orderId);
             formData.append('name', formValues.name);
             formData.append('quantity', formValues.quantity);
-            formData.append('total_amount', formValues.total_amount);
+            formData.append('totalAmount', formValues.totalAmount);
             formData.append('category', formValues.category);
             formData.append('orderDate', formValues.orderDate);
             formData.append('status', formValues.status);
             formData.append('warehouse', formValues.warehouse);
-            formData.append('delivery_date', formValues.delivery_date);
-            formData.append('order_status', formValues.order_status);
+            formData.append('deliveryDate', formValues.deliveryDate);
+            formData.append('orderStatus', formValues.orderStatus);
             formData.append('fileName', formValues.fileName);
             formData.append('image', formValues.image);
 
@@ -78,7 +78,7 @@ const AddOrderForm = ({ onSuccess }) => {
             <h2>Add New Order</h2>
             <form onSubmit={handleSubmit}>
                 <label>Order id:</label>
-                <input className="product-info2" type="text" name="order_id" value={formValues.order_id} onChange={handleChange}/>
+                <input className="product-info2" type="text" name="orderId" value={formValues.orderId} onChange={handleChange}/>
 
                 <label>Name:</label>
                 <input className="product-info2" type="text" name="name" value={formValues.name}
@@ -89,7 +89,7 @@ const AddOrderForm = ({ onSuccess }) => {
                        onChange={handleChange}/>
 
                 <label>Total Amount (UAH):</label>
-                <input className="product-info2" type="number" name="total_amount" value={formValues.total_amount}
+                <input className="product-info2" type="number" name="totalAmount" value={formValues.totalAmount}
                        onChange={handleChange}/>
 
                 <label>Warehouse:</label>
@@ -117,11 +117,11 @@ const AddOrderForm = ({ onSuccess }) => {
                 </select>
 
                 <label>Delivery Date:</label>
-                <input className="product-info2" type="date" name="delivery_date" value={formValues.delivery_date}
+                <input className="product-info2" type="date" name="deliveryDate" value={formValues.deliveryDate}
                        onChange={handleChange}/>
 
                 <label>Status:</label>
-                <select className="product-info2" name="order_status" value={formValues.order_status} onChange={handleChange}>
+                <select className="product-info2" name="orderStatus" value={formValues.orderStatus} onChange={handleChange}>
                     <option value="">Select Status</option>
                     {statuses.map((status, index) => (
                         <option key={index} value={status}>
