@@ -167,60 +167,60 @@ class WarehouseOrdersControllerTest {
 
     @Test
     public void addOrder_ValidParameters_ShouldReturnAddedOrder() throws Exception {
-        String order_id = "12345";
+        String orderId = "12345";
         String name = "Order 1";
         int quantity = 10;
-        double total_amount = 100.0;
+        double totalAmount = 100.0;
         String category = "Electronics";
         String orderDate = "2024-11-12";
-        String delivery_date = "2024-11-20";
+        String deliveryDate = "2024-11-20";
         String warehouse = "Warehouse A";
         String fileName = "order1.jpg";
-        String order_status = "Pending";
+        String orderStatus = "Pending";
         MockMultipartFile image = new MockMultipartFile("image", "order1.jpg", "image/jpeg", "image data".getBytes());
 
         WarehouseOrders order = new WarehouseOrders();
-        order.setOrderId(order_id);
+        order.setOrderId(orderId);
         order.setName(name);
         order.setQuantity(quantity);
-        order.setTotalAmount(total_amount);
+        order.setTotalAmount(totalAmount);
         order.setCategory(category);
         order.setOrderDate(LocalDate.parse(orderDate));
-        order.setDeliveryDate(LocalDate.parse(delivery_date));
+        order.setDeliveryDate(LocalDate.parse(deliveryDate));
         order.setWarehouse(warehouse);
         order.setFileName(fileName);
-        order.setOrderStatus(order_status);
+        order.setOrderStatus(orderStatus);
 
-        when(warehouseOrdersService.addOrder(eq(order_id), eq(name), eq(quantity), eq(total_amount), eq(category), eq(orderDate), eq(delivery_date), eq(warehouse), eq(order_status), eq(fileName), any(MultipartFile.class)))
+        when(warehouseOrdersService.addOrder(eq(orderId), eq(name), eq(quantity), eq(totalAmount), eq(category), eq(orderDate), eq(deliveryDate), eq(warehouse), eq(orderStatus), eq(fileName), any(MultipartFile.class)))
                 .thenReturn(order);
 
         mockMvc.perform(multipart("/api/warehouse/orders/add")
                         .file(image)
-                        .param("order_id", order_id)
+                        .param("orderId", orderId)
                         .param("name", name)
                         .param("quantity", String.valueOf(quantity))
-                        .param("total_amount", String.valueOf(total_amount))
+                        .param("totalAmount", String.valueOf(totalAmount))
                         .param("category", category)
                         .param("orderDate", orderDate)
-                        .param("delivery_date", delivery_date)
+                        .param("deliveryDate", deliveryDate)
                         .param("warehouse", warehouse)
                         .param("fileName", fileName)
-                        .param("order_status", order_status)
+                        .param("orderStatus", orderStatus)
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.orderId").value(order_id))
+                .andExpect(jsonPath("$.orderId").value(orderId))
                 .andExpect(jsonPath("$.name").value(name))
                 .andExpect(jsonPath("$.quantity").value(quantity))
-                .andExpect(jsonPath("$.totalAmount").value(total_amount))
+                .andExpect(jsonPath("$.totalAmount").value(totalAmount))
                 .andExpect(jsonPath("$.category").value(category))
                 .andExpect(jsonPath("$.orderDate[0]").value(2024))
                 .andExpect(jsonPath("$.orderDate[1]").value(11))
                 .andExpect(jsonPath("$.orderDate[2]").value(12))
                 .andExpect(jsonPath("$.warehouse").value(warehouse))
                 .andExpect(jsonPath("$.fileName").value(fileName))
-                .andExpect(jsonPath("$.orderStatus").value(order_status));
-        verify(warehouseOrdersService, times(1)).addOrder(eq(order_id), eq(name), eq(quantity), eq(total_amount), eq(category),
-                eq(orderDate), eq(delivery_date), eq(warehouse), eq(order_status), eq(fileName), any(MultipartFile.class));
+                .andExpect(jsonPath("$.orderStatus").value(orderStatus));
+        verify(warehouseOrdersService, times(1)).addOrder(eq(orderId), eq(name), eq(quantity), eq(totalAmount), eq(category),
+                eq(orderDate), eq(deliveryDate), eq(warehouse), eq(orderStatus), eq(fileName), any(MultipartFile.class));
     }
 
 

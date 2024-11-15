@@ -9,7 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.ExampleMatcher;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Example;
@@ -90,7 +89,8 @@ class WarehouseItemsServiceImplTest {
         ExampleMatcher matcher = ExampleMatcher.matching()
                 .withMatcher("warehouse", ExampleMatcher.GenericPropertyMatchers.ignoreCase())
                 .withMatcher("category", ExampleMatcher.GenericPropertyMatchers.ignoreCase())
-                .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
+                .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
+                .withIgnorePaths("price");
 
         Example<WareHouseItems> example = Example.of(exampleItem, matcher);
 

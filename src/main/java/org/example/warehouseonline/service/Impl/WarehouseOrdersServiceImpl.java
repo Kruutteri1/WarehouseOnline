@@ -43,7 +43,8 @@ public class WarehouseOrdersServiceImpl implements WarehouseOrdersService {
             ExampleMatcher matcher = ExampleMatcher.matching()
                     .withMatcher("warehouse", ExampleMatcher.GenericPropertyMatchers.ignoreCase())
                     .withMatcher("category", ExampleMatcher.GenericPropertyMatchers.ignoreCase())
-                    .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
+                    .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
+                    .withIgnorePaths("totalAmount");
 
             Example<WarehouseOrders> example = Example.of(exampleOrder, matcher);
 
