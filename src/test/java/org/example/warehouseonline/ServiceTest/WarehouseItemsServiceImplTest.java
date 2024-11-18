@@ -195,11 +195,13 @@ class WarehouseItemsServiceImplTest {
         String arrivalDate = "2024-11-12";
         String supplier = "Updated Supplier";
         String warehouse = "Updated Warehouse";
+        String fileName = "item 1";
+        MockMultipartFile image = new MockMultipartFile("image", "item1.jpg", "image/jpeg", "image data".getBytes());
 
         when(warehouseItemsRepository.findById(Long.parseLong(id))).thenReturn(Optional.of(item1));
         when(warehouseItemsRepository.save(any(WareHouseItems.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        WareHouseItems updatedItem = warehouseItemsService.updateItem(id, sku, name, quantity, price, category, arrivalDate, supplier, warehouse);
+        WareHouseItems updatedItem = warehouseItemsService.updateItem(id, sku, name, quantity, price, category, arrivalDate, supplier, warehouse, fileName, image);
 
         verify(warehouseItemsRepository, times(1)).findById(Long.parseLong(id));
 
@@ -231,12 +233,14 @@ class WarehouseItemsServiceImplTest {
         String arrivalDate = "2024-11-10";
         String supplier = "Nonexistent Supplier";
         String warehouse = "Nonexistent Warehouse";
+        String fileName = "item 1";
+        MockMultipartFile image = new MockMultipartFile("image", "item1.jpg", "image/jpeg", "image data".getBytes());
 
         when(warehouseItemsRepository.findById(Long.parseLong(id))).thenReturn(Optional.empty());
 
         RuntimeException thrownException = assertThrows(
                 RuntimeException.class,
-                () -> warehouseItemsService.updateItem(id, order_id, name, quantity, price, category, arrivalDate, supplier, warehouse)
+                () -> warehouseItemsService.updateItem(id, order_id, name, quantity, price, category, arrivalDate, supplier, warehouse, fileName, image)
         );
 
         assertEquals("Item not found with id: " + id, thrownException.getMessage());

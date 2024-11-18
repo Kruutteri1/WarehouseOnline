@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import './Warehouse.css';
-import { getCookie } from "../../Token/Token"
+import {getCookie} from "../../Token/Token"
 import axios from "axios";
 import ImageLoader from "./ImageLoader";
 import EditableField from "./EditableField";
@@ -14,9 +14,8 @@ const Warehouse = () => {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [filter, setFilter] = useState('');
     const [products, setProducts] = useState([]);
-    const [image, setImage] = useState(null);
     const [editingProductId, setEditingProductId] = useState(null);
-    const [updatedProduct, setUpdatedProduct] = useState([]); // Определение переменной updatedProducts
+    const [updatedProduct, setUpdatedProduct] = useState([]);
 
     const jwtToken = getCookie('jwtToken');
     const tokenObject = JSON.parse(jwtToken);
@@ -49,10 +48,6 @@ const Warehouse = () => {
         fetchData();
     }, [selectedWarehouse, selectedCategory, filter]);
 
-    const handleImageLoad = (data) => {
-        setImage(data);
-    };
-
     const handleWarehouseChange = (event) => {
         setSelectedWarehouse(event.target.value);
     };
@@ -76,7 +71,7 @@ const Warehouse = () => {
             upProduct[fieldName] = newValue;
             setUpdatedProduct(upProduct);
 
-            // Обновление товара на сайте
+            // Update product on the page
             setProducts(prevProducts => {
                 return prevProducts.map(product => {
                     if (product.id === productId) {
@@ -105,6 +100,8 @@ const Warehouse = () => {
             formDataUpdateProduct.append('arrivalDate', updatedProduct.arrivalDate);
             formDataUpdateProduct.append('supplier', updatedProduct.supplier);
             formDataUpdateProduct.append('warehouse', updatedProduct.warehouse);
+            formDataUpdateProduct.append('fileName', updatedProduct.fileName);
+            formDataUpdateProduct.append('image', updatedProduct.imageFile);
 
             const response = await axios.post('api/warehouse/items/update', formDataUpdateProduct, {
                 headers: {
@@ -195,7 +192,8 @@ const Warehouse = () => {
                             imageId={product.id}
                             alt={product.fileName}
                             actualToken={actualToken}
-                            onImageLoad={handleImageLoad}
+                            isEditing={editingProductId === product.id}
+                            handleSaveProductChanges={handleSaveProductChanges}
                         />
                         {editingProductId === product.id ? (
                             <>
@@ -283,7 +281,8 @@ const Warehouse = () => {
                             )}
                         </div>
                         <div className="product-info2">
-                            <button className="delete-button" onClick={() => handleDeleteProduct(product.id)}>Delete</button>
+                            <button className="delete-button" onClick={() => handleDeleteProduct(product.id)}>Delete
+                            </button>
                         </div>
                     </div>
                 ))}

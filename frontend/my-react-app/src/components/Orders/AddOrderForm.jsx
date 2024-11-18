@@ -63,7 +63,7 @@ const AddOrderForm = ({ onSuccess }) => {
 
             if (response.status === 200) {
                 onSuccess();
-                console.log('file_name:', formValues.fileName);
+                console.log('fileName:', formValues.fileName);
                 console.log('image:', formValues.image);
             } else {
                 console.error('Request failed with status:', response.status);

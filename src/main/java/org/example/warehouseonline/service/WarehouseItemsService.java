@@ -13,7 +13,7 @@ public interface WarehouseItemsService {
 
     WareHouseItems addItem(String sku, String name, int quantity, double price, String category, String arrivalDate, String supplier, String warehouse, String fileName, MultipartFile image);
 
-    WareHouseItems updateItem(String id, String sku, String name, int quantity, double price, String category, String arrivalDate, String supplier, String warehouse);
+    WareHouseItems updateItem(String id, String sku, String name, int quantity, double price, String category, String arrivalDate, String supplier, String warehouse, String fileName, MultipartFile image);
 
     ResponseEntity<String> deleteProductById(Integer productId);
 }
