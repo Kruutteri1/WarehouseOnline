@@ -161,7 +161,7 @@ class WarehouseItemsControllerTest {
     }
 
     @Test
-    public void updateItem_ValidParameters_ShouldReturnUpdatedItem() throws Exception {
+    public void updateItem_ValidParameters_WithImage_ShouldReturnUpdatedItem() throws Exception {
         String id = "1";
         String sku = "12345";
         String name = "Updated Item";
@@ -171,6 +171,8 @@ class WarehouseItemsControllerTest {
         String arrivalDate = "2024-11-12";
         String supplier = "Updated Supplier";
         String warehouse = "Updated Warehouse";
+        String fileName = "item1.jpg";
+        MockMultipartFile image = new MockMultipartFile("image", "item1.jpg", "image/jpeg", "image data".getBytes());
 
         WareHouseItems updatedItem = new WareHouseItems();
         updatedItem.setId(Integer.valueOf(id));
@@ -182,11 +184,15 @@ class WarehouseItemsControllerTest {
         updatedItem.setArrivalDate(LocalDate.parse(arrivalDate));
         updatedItem.setSupplier(supplier);
         updatedItem.setWarehouse(warehouse);
+        updatedItem.setFileName(fileName);
+        updatedItem.setImage(image.getBytes());
 
-        when(warehouseItemsService.updateItem(eq(id), eq(sku), eq(name), eq(quantity), eq(price), eq(category), eq(arrivalDate), eq(supplier), eq(warehouse)))
+        when(warehouseItemsService.updateItem(eq(id), eq(sku), eq(name), eq(quantity), eq(price), eq(category),
+                eq(arrivalDate), eq(supplier), eq(warehouse), eq(fileName), any(MultipartFile.class)))
                 .thenReturn(updatedItem);
 
-        mockMvc.perform(post("/api/warehouse/items/update")
+        mockMvc.perform(multipart("/api/warehouse/items/update")
+                        .file(image) // Передаем файл
                         .param("id", id)
                         .param("sku", sku)
                         .param("name", name)
@@ -196,6 +202,7 @@ class WarehouseItemsControllerTest {
                         .param("arrivalDate", arrivalDate)
                         .param("supplier", supplier)
                         .param("warehouse", warehouse)
+                        .param("fileName", fileName)
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id))
@@ -208,10 +215,13 @@ class WarehouseItemsControllerTest {
                 .andExpect(jsonPath("$.arrivalDate[1]").value(11))
                 .andExpect(jsonPath("$.arrivalDate[2]").value(12))
                 .andExpect(jsonPath("$.supplier").value(supplier))
-                .andExpect(jsonPath("$.warehouse").value(warehouse));
+                .andExpect(jsonPath("$.warehouse").value(warehouse))
+                .andExpect(jsonPath("$.fileName").value(fileName));
         verify(warehouseItemsService, times(1)).updateItem(eq(id), eq(sku), eq(name), eq(quantity), eq(price),
-                eq(category), eq(arrivalDate), eq(supplier), eq(warehouse));
+                eq(category), eq(arrivalDate), eq(supplier), eq(warehouse), eq(fileName), any(MultipartFile.class));
     }
+
+
 
     @Test
     public void getImage_InvalidId_ShouldReturnNotFound() throws Exception {
@@ -230,7 +240,7 @@ class WarehouseItemsControllerTest {
                 .thenReturn(new ResponseEntity<>("Product with ID: " + productId + " has been deleted", HttpStatus.OK));
 
         mockMvc.perform(delete("/api/warehouse/items/delete/{productId}", productId)
-                .header("Authorization", jwtToken))
+                        .header("Authorization", jwtToken))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Product with ID: " + productId + " has been deleted"));
         verify(warehouseItemsService, times(1)).deleteProductById(productId);

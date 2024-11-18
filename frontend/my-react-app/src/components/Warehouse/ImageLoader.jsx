@@ -1,35 +1,62 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const ImageLoader = ({ imageId, alt, actualToken, onImageLoad }) => {
+const ImageLoader = ({ imageId, alt, actualToken, isEditing, handleSaveProductChanges }) => {
     const [image, setImage] = useState(null);
-    const [response, setResponse] = useState(null);
 
-    const fetchImage =  () => {
-
+    const fetchImage = () => {
         axios.get(`api/warehouse/items/image/${imageId}`, {
             headers: {
-                Authorization: `Bearer ${actualToken}`
+                Authorization: `Bearer ${actualToken}`,
             },
-            responseType: "blob"
-        }).then((data) => {
-            setResponse(data);
-        }).catch((error) => {console.log(error)});
+            responseType: 'blob',
+        })
+            .then((data) => {
+                const imageBlob = new Blob([data.data], { type: 'image/jpeg' });
+                const imageUrl = URL.createObjectURL(imageBlob);
+                setImage(imageUrl);
+            })
+            .catch((error) => {
+                console.log('Error fetching image:', error);
+            });
     };
-    useEffect(() => {
-        if (response && response.status === 200) {
-            const imageBlob = new Blob([response.data], { type: 'image/jpeg' });
-            const imageUrl = URL.createObjectURL(imageBlob);
-            setImage(imageUrl);
-        }
-    }, [response]);
-    useEffect(() => {
 
-
+    useEffect(() => {
         fetchImage();
     }, [imageId, actualToken]);
 
-    return <img className="product-image" src={image} alt={alt} />;
+    const handleImageChange = (event) => {
+        const imageFile = event.target.files[0];
+        if (imageFile) {
+            const imageUrl = URL.createObjectURL(imageFile);
+            setImage(imageUrl);
+
+            handleSaveProductChanges(imageId, 'imageFile', imageFile);
+            handleSaveProductChanges(imageId, 'fileName', imageFile.name);
+        }
+    };
+
+    return (
+        <div>
+            {image ? (
+                <img
+                    className="product-image"
+                    src={image}
+                    alt={alt}
+                    onClick={() => isEditing && document.getElementById(`file-input-${imageId}`).click()}
+                />
+            ) : (
+                <p>Image not present</p>
+            )}
+
+            <input
+                type="file"
+                id={`file-input-${imageId}`}
+                style={{ display: 'none' }}
+                onChange={handleImageChange}
+            />
+        </div>
+    );
 };
 
 export default ImageLoader;

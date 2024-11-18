@@ -102,7 +102,14 @@ public class WarehouseItemsServiceImpl implements WarehouseItemsService {
     }
 
     @Override
-    public WareHouseItems updateItem(String id, String sku, String name, int quantity, double price, String category, String arrivalDate, String supplier, String warehouse) {
+    public WareHouseItems updateItem(String id, String sku, String name, int quantity, double price, String category, String arrivalDate, String supplier, String warehouse, String fileName, MultipartFile image) {
+        byte[] imageData;
+        try {
+            imageData = image.getBytes();
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading an image", e);
+        }
+
         Optional<WareHouseItems> optionalItem = warehouseItemsRepository.findById(Long.parseLong(id));
         if (optionalItem.isEmpty()) throw new RuntimeException("Item not found with id: " + id);
 
@@ -121,7 +128,8 @@ public class WarehouseItemsServiceImpl implements WarehouseItemsService {
 
         item.setSupplier(supplier);
         item.setWarehouse(warehouse);
-
+        item.setFileName(fileName);
+        item.setImage(imageData);
         return warehouseItemsRepository.save(item);
     }
 
