@@ -3,8 +3,8 @@ import './Orders.css';
 import { getCookie } from "../../Token/Token"
 import axios from "axios";
 import EditableField from "../Warehouse/EditableField";
-import ImageLoaderOrders from "../Warehouse/ImageLoader";
 import {Link} from "react-router-dom";
+import OrderImageLoader from "../Orders/OrderImageLoader";
 
 const warehouses = ['Main Warehouse', 'Warehouse B', 'Warehouse C'];
 const categories = ['Electronics', 'Clothing', 'Books', "Home Decor", "Sports & Outdoors"];
@@ -108,6 +108,8 @@ const Order = () => {
             formDataUpdateOrder.append('warehouse', updatedOrder.warehouse);
             formDataUpdateOrder.append('deliveryDate', updatedOrder.deliveryDate);
             formDataUpdateOrder.append('orderStatus', updatedOrder.orderStatus);
+            formDataUpdateOrder.append('fileName', updatedOrder.fileName);
+            formDataUpdateOrder.append('image', updatedOrder.imageFile);
 
             const response = await axios.post('http://localhost:5000/api/warehouse/orders/update', formDataUpdateOrder, {
                 headers: {
@@ -194,11 +196,12 @@ const Order = () => {
             <div className="order-container">
                 {orders.map(order => (
                     <div key={order.id} className="order-grid">
-                        <ImageLoaderOrders
-                            imageId={order.id}
+                        <OrderImageLoader
+                            orderId={order.id}
                             alt={order.fileName}
                             actualToken={actualToken}
-                            onImageLoad={handleImageLoad}
+                            isEditing={editingOrderId === order.id}
+                            handleSaveOrderChanges={handleSaveOrderChanges}
                         />
                         {editingOrderId === order.id ? (
                             <>

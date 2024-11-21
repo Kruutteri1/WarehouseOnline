@@ -193,7 +193,7 @@ class WarehouseOrdersServiceImplTest {
     }
 
     @Test
-    void testUpdateOrder_OrderExist() {
+    void testUpdateOrder_OrderExist() throws IOException {
         String id = "1";
         String order_id = "ORD123";
         String name = "Laptop";
@@ -204,12 +204,14 @@ class WarehouseOrdersServiceImplTest {
         String deliverDate = "2024-11-15";
         String warehouse = "Main Warehouse";
         String order_status = "Create";
+        String fileName = "order 1";
+        MultipartFile image = new MockMultipartFile("image", "image.png", "image/png", new byte[] {1, 23, 4});
 
         when(warehouseOrdersRepository.findById(Long.parseLong(id))).thenReturn(Optional.of(order1));
         when(warehouseOrdersRepository.save(any(WarehouseOrders.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         WarehouseOrders updatedItem = warehouseOrdersService.updateOrder(id, order_id, name, quantity, total_amount, category,
-                orderDate, deliverDate, order_status, warehouse);
+                orderDate, deliverDate, order_status, warehouse, fileName, image);
 
         verify(warehouseOrdersRepository, times(1)).findById(Long.parseLong(id));
 
@@ -227,6 +229,8 @@ class WarehouseOrdersServiceImplTest {
         assertEquals(LocalDate.parse(deliverDate, DateTimeFormatter.ofPattern("yyyy-MM-dd")), savedItem.getDeliveryDate());
         assertEquals(order_status, savedItem.getOrderStatus());
         assertEquals(warehouse, savedItem.getWarehouse());
+        assertEquals(fileName, savedItem.getFileName());
+        assertEquals(image.getBytes(), savedItem.getImage());
 
         assertEquals(savedItem, updatedItem);
     }
@@ -243,12 +247,14 @@ class WarehouseOrdersServiceImplTest {
         String deliverDate = "2024-11-15";
         String warehouse = "Main Warehouse";
         String order_status = "Create";
+        String fileName = "order 1";
+        MockMultipartFile image = mock(MockMultipartFile.class);
 
         when(warehouseOrdersRepository.findById(Long.parseLong(id))).thenReturn(Optional.empty());
 
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> warehouseOrdersService.updateOrder(id, order_id, name, quantity, total_amount, category,
-                        orderDate, deliverDate, order_status, warehouse)
+                        orderDate, deliverDate, order_status, warehouse, fileName, image)
         );
 
         assertEquals("Item not found with id: " + id, exception.getMessage());

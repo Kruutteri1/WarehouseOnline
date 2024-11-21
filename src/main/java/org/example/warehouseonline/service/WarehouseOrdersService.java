@@ -13,7 +13,7 @@ public interface WarehouseOrdersService {
 
     WarehouseOrders addOrder(String orderId, String name, int quantity, double totalAmount, String category, String OrderDate, String deliveryDate, String warehouse, String orderStatus, String fileName, MultipartFile image);
 
-    WarehouseOrders updateOrder(String id, String orderId, String name, int quantity, double totalAmount, String category, String orderDate, String deliveryDate, String orderStatus, String warehouse);
+    WarehouseOrders updateOrder(String id, String orderId, String name, int quantity, double totalAmount, String category, String orderDate, String deliveryDate, String orderStatus, String warehouse, String fileName, MultipartFile image);
 
     ResponseEntity<String> deleteOrderById(Integer productId);
 }

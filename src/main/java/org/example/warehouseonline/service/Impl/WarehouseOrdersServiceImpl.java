@@ -101,7 +101,14 @@ public class WarehouseOrdersServiceImpl implements WarehouseOrdersService {
     }
 
     @Override
-    public WarehouseOrders updateOrder(String id, String orderId, String name, int quantity, double totalAmount, String category, String orderDate, String deliveryDate, String orderStatus, String warehouse) {
+    public WarehouseOrders updateOrder(String id, String orderId, String name, int quantity, double totalAmount, String category, String orderDate, String deliveryDate, String orderStatus, String warehouse, String fileName, MultipartFile image) {
+        byte[] imageData;
+        try {
+            imageData = image.getBytes();
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading an image", e);
+        }
+
         Optional<WarehouseOrders> optionalItem = warehouseOrdersRepository.findById(Long.parseLong(id));
         if (optionalItem.isEmpty()) throw new RuntimeException("Item not found with id: " + id);
 
@@ -121,6 +128,8 @@ public class WarehouseOrdersServiceImpl implements WarehouseOrdersService {
         order.setWarehouse(warehouse);
         order.setOrderStatus(orderStatus);
 
+        order.setFileName(fileName);
+        order.setImage(imageData);
         return warehouseOrdersRepository.save(order);
     }
 

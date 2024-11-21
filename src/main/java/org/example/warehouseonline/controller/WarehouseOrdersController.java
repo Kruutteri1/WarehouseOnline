@@ -39,32 +39,34 @@ public class WarehouseOrdersController {
     @PostMapping("/add")
     @CrossOrigin(origins = "http://localhost:3000")
     public WarehouseOrders addOrder(@RequestParam("orderId") String orderId,
-                                  @RequestParam("name") String name,
-                                  @RequestParam("quantity") int quantity,
-                                  @RequestParam("totalAmount") double totalAmount,
-                                  @RequestParam("category") String category,
-                                  @RequestParam("orderDate") String OrderDate,
-                                  @RequestParam("deliveryDate") String deliveryDate,
-                                  @RequestParam("warehouse") String warehouse,
-                                  @RequestParam("fileName") String fileName,
-                                  @RequestParam("orderStatus") String orderStatus,
-                                  @RequestParam("image") MultipartFile image) {
+                                    @RequestParam("name") String name,
+                                    @RequestParam("quantity") int quantity,
+                                    @RequestParam("totalAmount") double totalAmount,
+                                    @RequestParam("category") String category,
+                                    @RequestParam("orderDate") String OrderDate,
+                                    @RequestParam("deliveryDate") String deliveryDate,
+                                    @RequestParam("warehouse") String warehouse,
+                                    @RequestParam("fileName") String fileName,
+                                    @RequestParam("orderStatus") String orderStatus,
+                                    @RequestParam("image") MultipartFile image) {
         return warehouseOrdersService.addOrder(orderId, name, quantity, totalAmount, category, OrderDate, deliveryDate, warehouse, orderStatus, fileName, image);
     }
 
     @PostMapping("/update")
     @CrossOrigin(origins = "http://localhost:3000")
     public WarehouseOrders updateOrder(@RequestParam("id") String id,
-                                     @RequestParam("orderId") String orderId,
-                                     @RequestParam("name") String name,
-                                     @RequestParam("quantity") int quantity,
-                                     @RequestParam("totalAmount") double totalAmount,
-                                     @RequestParam("category") String category,
-                                     @RequestParam("orderDate") String orderDate,
-                                     @RequestParam("deliveryDate") String deliveryDate,
-                                      @RequestParam("orderStatus") String orderStatus,
-                                     @RequestParam("warehouse") String warehouse) {
-        return warehouseOrdersService.updateOrder(id, orderId, name, quantity, totalAmount, category, orderDate, deliveryDate, orderStatus, warehouse);
+                                       @RequestParam("orderId") String orderId,
+                                       @RequestParam("name") String name,
+                                       @RequestParam("quantity") int quantity,
+                                       @RequestParam("totalAmount") double totalAmount,
+                                       @RequestParam("category") String category,
+                                       @RequestParam("orderDate") String orderDate,
+                                       @RequestParam("deliveryDate") String deliveryDate,
+                                       @RequestParam("orderStatus") String orderStatus,
+                                       @RequestParam("warehouse") String warehouse,
+                                       @RequestParam("fileName") String fileName,
+                                       @RequestParam("image") MultipartFile image) {
+        return warehouseOrdersService.updateOrder(id, orderId, name, quantity, totalAmount, category, orderDate, deliveryDate, orderStatus, warehouse, fileName, image);
     }
 
     @DeleteMapping("/delete/{orderId}")

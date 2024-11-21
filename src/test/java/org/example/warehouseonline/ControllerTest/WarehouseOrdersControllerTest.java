@@ -1,6 +1,7 @@
 package org.example.warehouseonline.ControllerTest;
 
 import org.example.warehouseonline.controller.WarehouseOrdersController;
+import org.example.warehouseonline.entity.WareHouseItems;
 import org.example.warehouseonline.entity.WarehouseOrders;
 import org.example.warehouseonline.service.Impl.WarehouseOrdersServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -216,12 +217,82 @@ class WarehouseOrdersControllerTest {
                 .andExpect(jsonPath("$.orderDate[0]").value(2024))
                 .andExpect(jsonPath("$.orderDate[1]").value(11))
                 .andExpect(jsonPath("$.orderDate[2]").value(12))
+                .andExpect(jsonPath("$.deliveryDate[0]").value(2024))
+                .andExpect(jsonPath("$.deliveryDate[1]").value(11))
+                .andExpect(jsonPath("$.deliveryDate[2]").value(20))
                 .andExpect(jsonPath("$.warehouse").value(warehouse))
                 .andExpect(jsonPath("$.fileName").value(fileName))
                 .andExpect(jsonPath("$.orderStatus").value(orderStatus));
         verify(warehouseOrdersService, times(1)).addOrder(eq(orderId), eq(name), eq(quantity), eq(totalAmount), eq(category),
                 eq(orderDate), eq(deliveryDate), eq(warehouse), eq(orderStatus), eq(fileName), any(MultipartFile.class));
     }
+
+    @Test
+    public void updateOrder_ValidParameters_WithImage_ShouldReturnUpdatedOrder() throws Exception {
+        String id = "1";
+        String orderId = "12345";
+        String name = "Order 1";
+        int quantity = 10;
+        double totalAmount = 100.0;
+        String category = "Electronics";
+        String orderDate = "2024-11-12";
+        String deliveryDate = "2024-11-20";
+        String warehouse = "Warehouse A";
+        String fileName = "order1.jpg";
+        String orderStatus = "Pending";
+        MockMultipartFile image = new MockMultipartFile("image", "item1.jpg", "image/jpeg", "image data".getBytes());
+
+        WarehouseOrders updatedOrder = new WarehouseOrders();
+        updatedOrder.setId(1);
+        updatedOrder.setOrderId(orderId);
+        updatedOrder.setName(name);
+        updatedOrder.setQuantity(quantity);
+        updatedOrder.setTotalAmount(totalAmount);
+        updatedOrder.setCategory(category);
+        updatedOrder.setOrderDate(LocalDate.parse(orderDate));
+        updatedOrder.setDeliveryDate(LocalDate.parse(deliveryDate));
+        updatedOrder.setWarehouse(warehouse);
+        updatedOrder.setFileName(fileName);
+        updatedOrder.setOrderStatus(orderStatus);
+        updatedOrder.setImage(image.getBytes());
+
+        when(warehouseOrdersService.updateOrder(anyString(), anyString(), anyString(), anyInt(), anyDouble(),
+                anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), any(MultipartFile.class)))
+                .thenReturn(updatedOrder);
+
+        mockMvc.perform(multipart("/api/warehouse/orders/update")
+                        .file(image)
+                        .param("id", id)
+                        .param("orderId", orderId)
+                        .param("name", name)
+                        .param("quantity", String.valueOf(quantity))
+                        .param("totalAmount", String.valueOf(totalAmount))
+                        .param("category", category)
+                        .param("orderDate", orderDate)
+                        .param("deliveryDate", deliveryDate)
+                        .param("warehouse", warehouse)
+                        .param("fileName", fileName)
+                        .param("orderStatus", orderStatus)
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("1"))
+                .andExpect(jsonPath("$.orderId").value(orderId))
+                .andExpect(jsonPath("$.name").value(name))
+                .andExpect(jsonPath("$.quantity").value(quantity))
+                .andExpect(jsonPath("$.totalAmount").value(totalAmount))
+                .andExpect(jsonPath("$.category").value(category))
+                .andExpect(jsonPath("$.orderDate[0]").value(2024))
+                .andExpect(jsonPath("$.orderDate[1]").value(11))
+                .andExpect(jsonPath("$.orderDate[2]").value(12))
+                .andExpect(jsonPath("$.deliveryDate[0]").value(2024))
+                .andExpect(jsonPath("$.deliveryDate[1]").value(11))
+                .andExpect(jsonPath("$.deliveryDate[2]").value(20))
+                .andExpect(jsonPath("$.warehouse").value(warehouse))
+                .andExpect(jsonPath("$.fileName").value(fileName));
+        verify(warehouseOrdersService, times(1)).updateOrder(anyString(), anyString(), anyString(), anyInt(),
+                anyDouble(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), any(MultipartFile.class));
+    }
+
 
 
     @Test
