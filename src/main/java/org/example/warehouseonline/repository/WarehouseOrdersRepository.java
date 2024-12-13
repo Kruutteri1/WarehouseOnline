@@ -14,6 +14,8 @@ public interface WarehouseOrdersRepository extends JpaRepository<WarehouseOrders
 
     Optional<WarehouseOrders> findById(long ItemId);
 
+    Optional<WarehouseOrders> findByOrderId(String orderId);
+
     List<WarehouseOrders> findAll();
 
     void deleteById(long id);

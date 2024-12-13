@@ -99,3 +99,10 @@
         padding: 8px;
     }
 }
+
+.error-message {
+    color: red;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+

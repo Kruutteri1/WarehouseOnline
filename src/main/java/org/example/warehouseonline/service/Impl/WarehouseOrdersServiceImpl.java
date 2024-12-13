@@ -80,6 +80,10 @@ public class WarehouseOrdersServiceImpl implements WarehouseOrdersService {
             throw new RuntimeException("Error reading an image", e);
         }
 
+        if (warehouseOrdersRepository.findByOrderId(orderId).isPresent()) {
+            throw new IllegalArgumentException("Order with OrderId " + orderId + " already exists. Please use a different OrderId.");
+        }
+
         WarehouseOrders newOrder = new WarehouseOrders();
         newOrder.setOrderId(orderId);
         newOrder.setName(name);

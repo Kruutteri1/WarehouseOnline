@@ -13,6 +13,8 @@ import java.util.Optional;
 public interface WarehouseItemsRepository extends JpaRepository<WareHouseItems, Integer> {
     Optional<WareHouseItems> findById(long ItemId);
 
+    Optional<WareHouseItems> findBySku(String sku);
+
     List<WareHouseItems> findAll();
 
     void deleteById(long id);
