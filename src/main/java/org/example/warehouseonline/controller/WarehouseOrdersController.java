@@ -1,10 +1,12 @@
 package org.example.warehouseonline.controller;
 
 
+import org.example.warehouseonline.entity.WareHouseItems;
 import org.example.warehouseonline.entity.WarehouseOrders;
 import org.example.warehouseonline.service.Impl.WarehouseOrdersServiceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,12 +25,14 @@ public class WarehouseOrdersController {
     }
 
     @GetMapping
-    public List<WarehouseOrders> getAllOrders(
+    public ResponseEntity<Page<WarehouseOrders>> getAllOrders(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String warehouse,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String filter
     ) {
-        return warehouseOrdersService.getFilteredOrders(warehouse, category, filter);
+        return warehouseOrdersService.getFilteredOrders(page, size, warehouse, category, filter);
     }
 
     @GetMapping("/oderImage/{id}")
@@ -65,7 +69,7 @@ public class WarehouseOrdersController {
                                        @RequestParam("orderStatus") String orderStatus,
                                        @RequestParam("warehouse") String warehouse,
                                        @RequestParam("fileName") String fileName,
-                                       @RequestParam("image") MultipartFile image) {
+                                       @RequestParam(value = "image", required = false) MultipartFile image) {
         return warehouseOrdersService.updateOrder(id, orderId, name, quantity, totalAmount, category, orderDate, deliveryDate, orderStatus, warehouse, fileName, image);
     }
 

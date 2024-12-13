@@ -5,8 +5,7 @@ import org.example.warehouseonline.entity.WareHouseItems;
 import org.example.warehouseonline.repository.WarehouseItemsRepository;
 import org.example.warehouseonline.service.WarehouseItemsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +17,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -33,10 +31,11 @@ public class WarehouseItemsServiceImpl implements WarehouseItemsService {
     }
 
     @Override
-    public List<WareHouseItems> getFilteredItems(String warehouse, String category, String filter) {
-        List<WareHouseItems> filteredItems;
+    public ResponseEntity<Page<WareHouseItems>> getFilteredItems(int page, int size, String warehouse, String category, String filter) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "id"));
+        Page<WareHouseItems> filteredItems;
 
-        if (StringUtils.hasText(filter) || StringUtils.hasText(warehouse) || StringUtils.hasText(category)) {
+        if (StringUtils.hasText(warehouse) || StringUtils.hasText(category) || StringUtils.hasText(filter)) {
             WareHouseItems exampleItem = new WareHouseItems();
             exampleItem.setWarehouse(StringUtils.hasText(warehouse) ? warehouse : null);
             exampleItem.setCategory(StringUtils.hasText(category) ? category : null);
@@ -50,11 +49,11 @@ public class WarehouseItemsServiceImpl implements WarehouseItemsService {
 
             Example<WareHouseItems> example = Example.of(exampleItem, matcher);
 
-            filteredItems = warehouseItemsRepository.findAll(example);
+            filteredItems = warehouseItemsRepository.findAll(example, pageable);
         } else {
-            filteredItems = warehouseItemsRepository.findAll();
+            filteredItems = warehouseItemsRepository.findAll(pageable);
         }
-        return filteredItems;
+        return ResponseEntity.ok(filteredItems);
     }
 
     @Override
@@ -103,13 +102,6 @@ public class WarehouseItemsServiceImpl implements WarehouseItemsService {
 
     @Override
     public WareHouseItems updateItem(String id, String sku, String name, int quantity, double price, String category, String arrivalDate, String supplier, String warehouse, String fileName, MultipartFile image) {
-        byte[] imageData;
-        try {
-            imageData = image.getBytes();
-        } catch (IOException e) {
-            throw new RuntimeException("Error reading an image", e);
-        }
-
         Optional<WareHouseItems> optionalItem = warehouseItemsRepository.findById(Long.parseLong(id));
         if (optionalItem.isEmpty()) throw new RuntimeException("Item not found with id: " + id);
 
@@ -129,7 +121,14 @@ public class WarehouseItemsServiceImpl implements WarehouseItemsService {
         item.setSupplier(supplier);
         item.setWarehouse(warehouse);
         item.setFileName(fileName);
-        item.setImage(imageData);
+        if (image != null && !image.isEmpty()) {
+            try {
+                byte[] imageData = image.getBytes();
+                item.setImage(imageData);
+            } catch (IOException e) {
+                throw new RuntimeException("Error reading an image", e);
+            }
+        }
         return warehouseItemsRepository.save(item);
     }
 

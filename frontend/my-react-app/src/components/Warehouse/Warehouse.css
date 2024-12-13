@@ -31,7 +31,7 @@ label {
 }
 
 .edit-button {
-    background-color: #4CAF50; /* Green background for edit */
+    background-color: #4CAF50;
     color: white;
     padding: 8px 16px;
     border: none;
@@ -41,7 +41,7 @@ label {
 }
 
 .save-button {
-    background-color: #2196F3; /* Blue background for save */
+    background-color: #2196F3;
     color: white;
     padding: 8px 16px;
     border: none;
@@ -51,7 +51,7 @@ label {
 }
 
 .delete-button {
-    background-color: #f44336; /* Красный фон для удаления */
+    background-color: #f44336;
     color: white;
     padding: 8px 16px;
     border: none;
@@ -87,9 +87,9 @@ label {
 }
 
 .add-product-button:hover {
-    background: linear-gradient(145deg, #4caf50, #6dbf8e); /* Обратный градиент */
-    transform: translateY(-3px); /* Поднимаем кнопку */
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3); /* Увеличиваем тень */
+    background: linear-gradient(145deg, #4caf50, #6dbf8e);
+    transform: translateY(-3px);
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .product-grid {
@@ -128,4 +128,55 @@ label {
     object-fit: cover;
     display: block;
     margin: 0 auto;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+    font-family: Arial, sans-serif;
+}
+
+.pagination button {
+    padding: 10px 16px;
+    margin: 0 10px;
+    border: none;
+    border-radius: 5px;
+    background: linear-gradient(135deg, #17a2b8, #20c997);
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.pagination button:hover {
+    background: linear-gradient(135deg, #20c997, #17a2b8);
+    transform: translateY(-2px);
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.pagination button:disabled {
+    background-color: #e9ecef;
+    color: #adb5bd;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.pagination span {
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #495057;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    margin: 0 6px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.pagination span.current-page {
+    background: linear-gradient(135deg, #17a2b8, #20c997);
+    color: #fff;
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
 }

@@ -16,6 +16,8 @@ const Warehouse = () => {
     const [products, setProducts] = useState([]);
     const [editingProductId, setEditingProductId] = useState(null);
     const [updatedProduct, setUpdatedProduct] = useState([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
 
     const jwtToken = getCookie('jwtToken');
     const tokenObject = JSON.parse(jwtToken);
@@ -26,6 +28,8 @@ const Warehouse = () => {
             try {
                 const response = await axios.get('api/warehouse/items', {
                     params: {
+                        page: currentPage,
+                        size: 10,
                         warehouse: selectedWarehouse,
                         category: selectedCategory,
                         filter: filter,
@@ -36,7 +40,8 @@ const Warehouse = () => {
                 });
 
                 if (response.status === 200) {
-                    setProducts(response.data);
+                    setProducts(response.data.content);
+                    setTotalPages(response.data.totalPages);
                 } else {
                     console.error('Request failed with status:', response.status);
                 }
@@ -46,18 +51,33 @@ const Warehouse = () => {
         };
 
         fetchData();
-    }, [selectedWarehouse, selectedCategory, filter]);
+    }, [currentPage, selectedWarehouse, selectedCategory, filter]);
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages - 1) {
+            setCurrentPage(prevPage => prevPage + 1);
+        }
+    };
+
+    const handlePreviousPage = () => {
+        if (currentPage > 0) {
+            setCurrentPage(prevPage => prevPage - 1);
+        }
+    };
 
     const handleWarehouseChange = (event) => {
         setSelectedWarehouse(event.target.value);
+        setCurrentPage(0);
     };
 
     const handleCategoryChange = (event) => {
         setSelectedCategory(event.target.value);
+        setCurrentPage(0);
     };
 
     const handleFilterChange = (event) => {
         setFilter(event.target.value);
+        setCurrentPage(0);
     };
 
     const handleEditProduct = (productId) => {
@@ -286,6 +306,15 @@ const Warehouse = () => {
                         </div>
                     </div>
                 ))}
+            </div>
+            <div className="pagination">
+                <button onClick={handlePreviousPage} disabled={currentPage === 0}>
+                    Previous
+                </button>
+                <span>Page {currentPage + 1} of {totalPages}</span>
+                <button onClick={handleNextPage} disabled={currentPage === totalPages - 1}>
+                    Next
+                </button>
             </div>
         </div>
     );
