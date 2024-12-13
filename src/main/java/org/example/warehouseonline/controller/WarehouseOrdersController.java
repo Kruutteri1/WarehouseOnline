@@ -30,9 +30,10 @@ public class WarehouseOrdersController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String warehouse,
             @RequestParam(required = false) String category,
+            @RequestParam(required = false) String status,
             @RequestParam(required = false) String filter
     ) {
-        return warehouseOrdersService.getFilteredOrders(page, size, warehouse, category, filter);
+        return warehouseOrdersService.getFilteredOrders(page, size, warehouse, category, status, filter);
     }
 
     @GetMapping("/oderImage/{id}")

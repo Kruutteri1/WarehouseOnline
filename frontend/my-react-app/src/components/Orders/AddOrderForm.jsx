@@ -57,7 +57,7 @@ const AddOrderForm = ({ onSuccess }) => {
             const response = await axios.post('http://localhost:5000/api/warehouse/orders/add', formData, {
                 headers: {
                     Authorization: `Bearer ${actualToken}`,
-                    'Content-Type': 'multipart/form-data' // Указываем тип контента как multipart/form-data
+                    'Content-Type': 'multipart/form-data'
                 },
             });
 
