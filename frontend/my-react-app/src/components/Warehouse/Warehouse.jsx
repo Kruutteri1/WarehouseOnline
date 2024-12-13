@@ -91,7 +91,7 @@ const Warehouse = () => {
             upProduct[fieldName] = newValue;
             setUpdatedProduct(upProduct);
 
-            // Update product on the page
+            // Update goods on the page
             setProducts(prevProducts => {
                 return prevProducts.map(product => {
                     if (product.id === productId) {

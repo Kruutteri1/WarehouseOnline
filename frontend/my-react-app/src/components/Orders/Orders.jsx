@@ -13,6 +13,7 @@ const statuses = ['Created', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
 const Order = () => {
     const [selectedWarehouse, setSelectedWarehouse] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedStatus, setSelectedStatus] = useState('');
     const [filter, setFilter] = useState('');
     const [orders, setOrders] = useState([]);
     const [editingOrderId, setEditingOrderId] = useState(null);
@@ -30,9 +31,10 @@ const Order = () => {
                 const response = await axios.get('api/warehouse/orders', {
                     params: {
                         page: currentPage,
-                        size: 2,
+                        size: 10,
                         warehouse: selectedWarehouse,
                         category: selectedCategory,
+                        status: selectedStatus,
                         filter: filter,
                     },
                     headers: {
@@ -52,7 +54,7 @@ const Order = () => {
         };
 
         fetchData();
-    }, [currentPage, selectedWarehouse, selectedCategory, filter]);
+    }, [currentPage, selectedWarehouse, selectedCategory, selectedStatus, filter]);
 
     const handleNextPage = () => {
         if (currentPage < totalPages - 1) {
@@ -76,6 +78,11 @@ const Order = () => {
         setCurrentPage(0);
     };
 
+    const handleStatusChange = (event) => {
+        setSelectedStatus(event.target.value);
+        setCurrentPage(0);
+    };
+
     const handleFilterChange = (event) => {
         setFilter(event.target.value);
         setCurrentPage(0);
@@ -92,7 +99,7 @@ const Order = () => {
             upOrder[fieldName] = newValue;
             setUpdatedOrder(upOrder);
 
-            // Обновление товара на сайте
+            // Update goods on the page
             setOrders(prevOrders => {
                 return prevOrders.map(order => {
                     if (order.id === orderId) {
@@ -182,6 +189,16 @@ const Order = () => {
                         {categories.map((category, index) => (
                             <option key={index} value={category}>
                                 {category}
+                            </option>
+                        ))}
+                    </select>
+
+                    <label>Status:</label>
+                    <select value={selectedStatus} onChange={handleStatusChange}>
+                        <option value="">Select Status</option>
+                        {statuses.map((status, index) => (
+                            <option key={index} value={status}>
+                                {status}
                             </option>
                         ))}
                     </select>

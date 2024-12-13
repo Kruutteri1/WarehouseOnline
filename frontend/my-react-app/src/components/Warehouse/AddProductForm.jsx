@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { getCookie } from '../../Token/Token';
 import './AddProductForm.css';
+import {useNavigate} from "react-router-dom";
 
 const AddProductForm = ({ onSuccess }) => {
     const categories = ['Electronics', 'Clothing', 'Books', "Home Decor", "Sports & Outdoors"];
-    const warehouses = ['Main Warehouse', 'Warehouse B', 'Warehouse C']; // Add your warehouse options
+    const warehouses = ['Main Warehouse', 'Warehouse B', 'Warehouse C'];
+    const [errorMessage, setErrorMessage] = useState('');
+    const navigate = useNavigate();
 
     const [formValues, setFormValues] = useState({
         sku: '',
@@ -61,17 +64,26 @@ const AddProductForm = ({ onSuccess }) => {
 
             if (response.status === 200) {
                 onSuccess();
-            } else {
-                console.error('Request failed with status:', response.status);
+                navigate("/warehouse")
             }
         } catch (error) {
-            console.error('Error during fetch:', error);
+            if (error.response && error.response.status === 400) {
+                setErrorMessage(error.response.data || 'An error occurred. Please try again.');
+            } else {
+                console.error('Error during fetch:', error);
+                setErrorMessage('An unexpected error occurred. Please try again later.');
+            }
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth',
+            });
         }
     };
 
     return (
         <div className="form">
             <h2>Add New Product</h2>
+            {errorMessage && <div className="error-message">{errorMessage}</div>}
             <form onSubmit={handleSubmit}>
                 <label>SKU:</label>
                 <input className="product-info2" type="text" name="sku" value={formValues.sku} onChange={handleChange}/>

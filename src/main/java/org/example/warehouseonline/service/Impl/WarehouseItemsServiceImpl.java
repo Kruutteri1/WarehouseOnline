@@ -65,6 +65,10 @@ public class WarehouseItemsServiceImpl implements WarehouseItemsService {
             throw new RuntimeException("Error reading an image", e);
         }
 
+        if (warehouseItemsRepository.findBySku(sku).isPresent()) {
+            throw new IllegalArgumentException("Item with SKU " + sku + " already exists. Please use a different SKU.");
+        }
+
         WareHouseItems newItem = new WareHouseItems();
         newItem.setSku(sku);
         newItem.setName(name);

@@ -30,19 +30,21 @@ public class WarehouseOrdersServiceImpl implements WarehouseOrdersService {
     }
 
     @Override
-    public ResponseEntity<Page<WarehouseOrders>> getFilteredOrders(int page, int size, String warehouse, String category, String filter) {
+    public ResponseEntity<Page<WarehouseOrders>> getFilteredOrders(int page, int size, String warehouse, String category, String status, String filter) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "id"));
         Page<WarehouseOrders> filteredOrders;
 
-        if (StringUtils.hasText(filter) || StringUtils.hasText(warehouse) || StringUtils.hasText(category)) {
+        if (StringUtils.hasText(filter) || StringUtils.hasText(warehouse) || StringUtils.hasText(category) || StringUtils.hasText(status)) {
             WarehouseOrders exampleOrder = new WarehouseOrders();
             exampleOrder.setWarehouse(StringUtils.hasText(warehouse) ? warehouse : null);
             exampleOrder.setCategory(StringUtils.hasText(category) ? category : null);
+            exampleOrder.setOrderStatus(StringUtils.hasText(status) ? status : null);
             exampleOrder.setName(StringUtils.hasText(filter) ? filter : null);
 
             ExampleMatcher matcher = ExampleMatcher.matching()
                     .withMatcher("warehouse", ExampleMatcher.GenericPropertyMatchers.ignoreCase())
                     .withMatcher("category", ExampleMatcher.GenericPropertyMatchers.ignoreCase())
+                    .withMatcher("order_status", ExampleMatcher.GenericPropertyMatchers.ignoreCase())
                     .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
                     .withIgnorePaths("totalAmount");
 
@@ -76,6 +78,10 @@ public class WarehouseOrdersServiceImpl implements WarehouseOrdersService {
             imageData = image.getBytes();
         } catch (IOException e) {
             throw new RuntimeException("Error reading an image", e);
+        }
+
+        if (warehouseOrdersRepository.findByOrderId(orderId).isPresent()) {
+            throw new IllegalArgumentException("Order with OrderId " + orderId + " already exists. Please use a different OrderId.");
         }
 
         WarehouseOrders newOrder = new WarehouseOrders();
