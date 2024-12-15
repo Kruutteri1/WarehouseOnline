@@ -38,15 +38,13 @@ const ImageLoader = ({ orderId, alt, actualToken, isEditing, handleSaveOrderChan
 
     return (
         <div>
-            {image ? (
+            {image && (
                 <img
                     className="product-image"
                     src={image}
                     alt={alt}
                     onClick={() => isEditing && document.getElementById(`file-input-${orderId}`).click()}
                 />
-            ) : (
-                <p>Image not present</p>
             )}
 
             <input

@@ -1,11 +1,13 @@
 package org.example.warehouseonline.service.Impl;
 
 import jakarta.transaction.Transactional;
-import org.example.warehouseonline.entity.WareHouseItems;
 import org.example.warehouseonline.entity.WarehouseOrders;
 import org.example.warehouseonline.repository.WarehouseOrdersRepository;
 import org.example.warehouseonline.service.WarehouseOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,6 +32,7 @@ public class WarehouseOrdersServiceImpl implements WarehouseOrdersService {
     }
 
     @Override
+    @Cacheable(value = "filteredOrders", key = "#page + '-' + #size + '-' + #warehouse + '-' + #category + '-' + #status + '-' + #filter")
     public ResponseEntity<Page<WarehouseOrders>> getFilteredOrders(int page, int size, String warehouse, String category, String status, String filter) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "id"));
         Page<WarehouseOrders> filteredOrders;
@@ -58,6 +61,7 @@ public class WarehouseOrdersServiceImpl implements WarehouseOrdersService {
     }
 
     @Override
+    @Cacheable(value = "orderImages", key = "#id")
     public ResponseEntity<byte[]> getOrderImage(Long id) {
         Optional<WarehouseOrders> itemOptional = warehouseOrdersRepository.findById(id);
         if (itemOptional.isPresent()) {
@@ -72,6 +76,7 @@ public class WarehouseOrdersServiceImpl implements WarehouseOrdersService {
     }
 
     @Override
+    @CachePut(value = "filteredOrders", key = "#result.id")
     public WarehouseOrders addOrder(String orderId, String name, int quantity, double totalAmount, String category, String OrderDate, String deliveryDate, String warehouse, String orderStatus, String fileName, MultipartFile image) {
         byte[] imageData;
         try {
@@ -107,6 +112,7 @@ public class WarehouseOrdersServiceImpl implements WarehouseOrdersService {
     }
 
     @Override
+    @CacheEvict(value = {"filteredOrders", "orderImages"}, key = "#id")
     public WarehouseOrders updateOrder(String id, String orderId, String name, int quantity, double totalAmount, String category, String orderDate, String deliveryDate, String orderStatus, String warehouse, String fileName, MultipartFile image) {
         Optional<WarehouseOrders> optionalItem = warehouseOrdersRepository.findById(Long.parseLong(id));
         if (optionalItem.isEmpty()) throw new RuntimeException("Item not found with id: " + id);
@@ -140,6 +146,7 @@ public class WarehouseOrdersServiceImpl implements WarehouseOrdersService {
     }
 
     @Override
+    @CacheEvict(value = {"filteredOrders", "orderImages"}, key = "#orderId")
     public ResponseEntity<String> deleteOrderById(Integer orderId) {
         if (orderId < 0) return new ResponseEntity<>("Invalid order ID: must be a positive integer", HttpStatus.BAD_REQUEST);
         Optional<WarehouseOrders> order = warehouseOrdersRepository.findById((long) orderId);
