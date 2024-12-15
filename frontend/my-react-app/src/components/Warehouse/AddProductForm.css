@@ -106,3 +106,7 @@
     margin-bottom: 10px;
 }
 
+.error-border {
+    border: 2px solid red;
+}
+
