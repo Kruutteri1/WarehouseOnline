@@ -11,15 +11,15 @@ const AddOrderForm = ({ onSuccess }) => {
     const navigate = useNavigate();
 
     const [formValues, setFormValues] = useState({
-        order_id: '',
+        orderId: '',
         name: '',
         quantity: '',
-        total_amount: '',
+        totalAmount: '',
         category: '',
         orderDate: '',
-        order_status: '',
+        orderStatus: '',
         warehouse: '',
-        delivery_date: '',
+        deliveryDate: '',
         fileName: '',
         image: null
     });
@@ -38,6 +38,18 @@ const AddOrderForm = ({ onSuccess }) => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        if (
+            !formValues.orderId || !formValues.name || !formValues.quantity || !formValues.totalAmount ||
+            !formValues.category || !formValues.orderDate || !formValues.orderStatus || !formValues.warehouse ||
+            !formValues.deliveryDate
+        ) {
+            setErrorMessage("Please fill out all required fields.");
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth',
+            });
+            return;
+        }
         try {
             const jwtToken = getCookie('jwtToken');
             const tokenObject = JSON.parse(jwtToken);
@@ -50,7 +62,6 @@ const AddOrderForm = ({ onSuccess }) => {
             formData.append('totalAmount', formValues.totalAmount);
             formData.append('category', formValues.category);
             formData.append('orderDate', formValues.orderDate);
-            formData.append('status', formValues.status);
             formData.append('warehouse', formValues.warehouse);
             formData.append('deliveryDate', formValues.deliveryDate);
             formData.append('orderStatus', formValues.orderStatus);

@@ -38,6 +38,17 @@ const AddProductForm = ({ onSuccess }) => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        if (
+            !formValues.sku || !formValues.name || !formValues.quantity || !formValues.price ||
+            !formValues.category || !formValues.arrivalDate || !formValues.supplier || !formValues.warehouse
+        ) {
+            setErrorMessage("Please fill out all required fields.");
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth',
+            });
+            return;
+        }
         try {
             const jwtToken = getCookie('jwtToken');
             const tokenObject = JSON.parse(jwtToken);
