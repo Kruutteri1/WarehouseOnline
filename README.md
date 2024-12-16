@@ -1,4 +1,5 @@
 Warehouse Management System
+
 A full-featured web application with both frontend and backend components. The project includes database usage, RESTful API, caching, user authentication via JWT tokens, and pagination for managing large datasets efficiently.
 
 The backend is built using Java with Spring Boot and Hibernate frameworks, while the frontend is developed with React and JavaScript. The application features a user-friendly interface, allowing for easy navigation and real-time editing of inventory directly on the site.
