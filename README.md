@@ -1,4 +1,4 @@
-Warehouse Management System
+Warehouse Management System.
 
 A full-featured web application with both frontend and backend components. The project includes database usage, RESTful API, caching, user authentication via JWT tokens, and pagination for managing large datasets efficiently.
 
