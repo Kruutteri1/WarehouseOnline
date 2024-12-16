@@ -1,2 +1,8 @@
-Warehouse management system, a full-featured web application with both frontend and backend components. The project includes database usage, RESTful API, Cache and user authentication via JWT Token. I implemented this project using Java along with the Spring Boot and Hibernate frameworks for the backend, and React, JS for the frontend. The application features a user-friendly interface that allows for easy navigation and real-time editing of inventory directly on the site. This project allowed me to delve into creating secure and scalable web applications, providing high-level user and data management.
+Warehouse Management System
+A full-featured web application with both frontend and backend components. The project includes database usage, RESTful API, caching, user authentication via JWT tokens, and pagination for managing large datasets efficiently.
+
+The backend is built using Java with Spring Boot and Hibernate frameworks, while the frontend is developed with React and JavaScript. The application features a user-friendly interface, allowing for easy navigation and real-time editing of inventory directly on the site.
+
+This project gave me the opportunity to explore creating secure and scalable web applications, focusing on high-level user and data management. By incorporating features like pagination and caching, the application ensures smooth performance and an optimal user experience, even with extensive data.
+
 ![warehouseSystem](https://github.com/user-attachments/assets/8302b537-81be-4cd4-8474-47a33fb3b2cd)
