@@ -51,8 +51,7 @@ const AddProductForm = ({ onSuccess }) => {
         }
         try {
             const jwtToken = getCookie('jwtToken');
-            const tokenObject = JSON.parse(jwtToken);
-            const actualToken = tokenObject.token;
+            const actualToken = JSON.parse(jwtToken);
 
             const formData = new FormData();
             formData.append('sku', formValues.sku);
@@ -78,8 +77,8 @@ const AddProductForm = ({ onSuccess }) => {
                 navigate("/warehouse")
             }
         } catch (error) {
-            if (error.response && error.response.status === 400) {
-                setErrorMessage(error.response.data || 'An error occurred. Please try again.');
+            if (error.response && error.response.data) {
+                setErrorMessage(error.response.data.message || 'An error occurred. Please try again.');
             } else {
                 console.error('Error during fetch:', error);
                 setErrorMessage('An unexpected error occurred. Please try again later.');

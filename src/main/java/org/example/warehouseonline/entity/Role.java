@@ -1,6 +1,7 @@
 package org.example.warehouseonline.entity;
 
 public enum Role {
-    USER,
-    ADMIN
+    ROLE_USER,
+    ROLE_MANAGER,
+    ROLE_ADMIN
 }
