@@ -14,7 +14,6 @@ const Navbar = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Проверка наличия токена в куках при загрузке компонента
         const token = document.cookie
             .split(";")
             .find((cookie) => cookie.trim().startsWith("jwtToken"));
@@ -29,8 +28,8 @@ const Navbar = () => {
     };
 
     const handleLogout = () => {
-        deleteCookie("jwtToken"); // Удаление токена из куки
-        setIsAuthenticated(false); // Установка состояния авторизации в false
+        deleteCookie("jwtToken");
+        setIsAuthenticated(false);
         navigate("/")
     };
 

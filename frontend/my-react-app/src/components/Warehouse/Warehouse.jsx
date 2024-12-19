@@ -20,8 +20,7 @@ const Warehouse = () => {
     const [totalPages, setTotalPages] = useState(1);
 
     const jwtToken = getCookie('jwtToken');
-    const tokenObject = JSON.parse(jwtToken);
-    const actualToken = tokenObject.token;
+    const actualToken = JSON.parse(jwtToken);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -29,7 +28,7 @@ const Warehouse = () => {
                 const response = await axios.get('api/warehouse/items', {
                     params: {
                         page: currentPage,
-                        size: 10,
+                        size: 5,
                         warehouse: selectedWarehouse,
                         category: selectedCategory,
                         filter: filter,
@@ -301,7 +300,8 @@ const Warehouse = () => {
                             )}
                         </div>
                         <div className="product-info2">
-                            <button className="delete-button" onClick={() => handleDeleteProduct(product.id)}>Delete
+                            <button className="delete-button" onClick={() => handleDeleteProduct(product.id)}>
+                                Delete
                             </button>
                         </div>
                     </div>

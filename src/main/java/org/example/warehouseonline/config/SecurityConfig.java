@@ -3,6 +3,7 @@ package org.example.warehouseonline.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,10 +30,12 @@ public class SecurityConfig {
                         request ->
                                 request
                                         .requestMatchers("api/auth/**", "swagger-ui/**",
-                                                "v3/api-docs/**", "swagger-resources/*")
-                                        .permitAll()
-                                        .anyRequest()
-                                        .authenticated())
+                                                "v3/api-docs/**", "swagger-resources/*").permitAll()
+                                        .requestMatchers(HttpMethod.GET, "/api/warehouse/**").hasAnyRole("USER", "MANAGER", "ADMIN")
+                                        .requestMatchers(HttpMethod.POST, "/api/warehouse/**").hasAnyRole("MANAGER", "ADMIN")
+                                        .requestMatchers(HttpMethod.PUT, "/api/warehouse/**").hasAnyRole("MANAGER", "ADMIN")
+                                        .requestMatchers(HttpMethod.DELETE, "/api/warehouse/**").hasAnyRole("ADMIN")
+                                        .anyRequest().authenticated())
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS))

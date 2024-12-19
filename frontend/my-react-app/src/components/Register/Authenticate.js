@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./authenticate.css";
 import { setToken } from "../../Token/Token";
@@ -17,11 +17,12 @@ function App() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setFormErrors(validate(formValues));
         setIsSubmit(true);
 
-        // Если ошибок нет, отправляем данные на сервер
-        if (Object.keys(formErrors).length === 0) {
+        const errors = validate(formValues);
+        setFormErrors(errors);
+
+        if (Object.keys(errors).length === 0) {
             try {
                 const response = await fetch("/api/auth/authenticate", {
                     method: "POST",
@@ -34,14 +35,14 @@ function App() {
                 if (response.ok) {
                     console.log("Sign In successful!");
                     const responseData = await response.json();
-                    setToken(responseData);
+                    setToken(responseData.token);
 
                     navigate("/")
                 } else {
-                    console.error("Sing In failed.");
+                    console.error("Sign In failed.");
                 }
             } catch (error) {
-                console.error("Error during Sing In:", error);
+                console.error("Error during Sign In:", error);
             }
         }
     };
@@ -56,8 +57,6 @@ function App() {
         }
         if (!values.password) {
             errors.password = "Password is required";
-        } else if (values.password.length < 4) {
-            errors.password = "Password must be more than 4 characters";
         } else if (values.password.length > 10) {
             errors.password = "Password cannot exceed more than 10 characters";
         }
@@ -69,9 +68,9 @@ function App() {
             <form onSubmit={handleSubmit}>
                 <div className="ui form">
                     <h1 className="centered">WarehouseOnline</h1>
-                    <p>{formErrors.username}</p>
                     <div className="field">
                         <label>Email</label>
+                        {isSubmit && <p>{formErrors.email}</p>}
                         <input
                             type="text"
                             name="email"
@@ -80,9 +79,9 @@ function App() {
                             onChange={handleChange}
                         />
                     </div>
-                    <p>{formErrors.email}</p>
                     <div className="field">
                         <label>Password</label>
+                        {isSubmit && <p>{formErrors.password}</p>}
                         <input
                             type="password"
                             name="password"
@@ -91,10 +90,9 @@ function App() {
                             onChange={handleChange}
                         />
                     </div>
-                    <p>{formErrors.password}</p>
-                    <button className="fluid ui button gray">Sign Up</button>
+                    <button className="fluid ui button gray">Sign In</button>
                     <div className="sign-in-link">
-                        <p className="gray">Create a new account? <Link to="/registration">Sign In</Link></p>
+                        <p className="gray">Create a new account? <Link to="/registration">Sign Up</Link></p>
                     </div>
                 </div>
             </form>

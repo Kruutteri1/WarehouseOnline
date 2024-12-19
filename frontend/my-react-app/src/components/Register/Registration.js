@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./registration.css";
 
@@ -7,38 +7,12 @@ function App() {
     const [formValues, setFormValues] = useState(initialValues);
     const [formErrors, setFormErrors] = useState({});
     const [isSubmit, setIsSubmit] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormValues({ ...formValues, [name]: value });
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setFormErrors(validate(formValues));
-        setIsSubmit(true);
-
-        if (Object.keys(formErrors).length === 0) {
-            try {
-                const response = await fetch("/api/auth/register", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(formValues),
-                });
-
-                if (response.ok) {
-                    console.log("Registration successful!");
-                    navigate("/authenticate");
-                } else {
-                    console.error("Registration failed.");
-                }
-            } catch (error) {
-                console.error("Error during registration:", error);
-            }
-        }
     };
 
     const validate = (values) => {
@@ -62,13 +36,46 @@ function App() {
         return errors;
     };
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsSubmit(true);
+
+        const errors = validate(formValues);
+        setFormErrors(errors);
+
+        if (Object.keys(errors).length === 0) {
+            try {
+                const response = await fetch("/api/auth/register", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(formValues),
+                });
+
+                if (response.ok) {
+                    console.log("Registration successful!");
+                    navigate("/authenticate");
+                } else {
+                    const errorData = await response.json();
+                    setErrorMessage(errorData.message || 'An error occurred. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error during fetch:', error);
+                setErrorMessage('An unexpected error occurred. Please try again later.');
+            }
+        }
+    };
+
     return (
         <div className="container">
             <form onSubmit={handleSubmit}>
                 <div className="ui form">
                     <h1 className="centered">WarehouseOnline</h1>
+                    {errorMessage && <div className="error-message">{errorMessage}</div>}
                     <div className="field">
                         <label>Username</label>
+                        {isSubmit && <p>{formErrors.username}</p>}
                         <input
                             type="text"
                             name="username"
@@ -77,9 +84,9 @@ function App() {
                             onChange={handleChange}
                         />
                     </div>
-                    <p>{formErrors.username}</p>
                     <div className="field">
                         <label>Email</label>
+                        {isSubmit && <p>{formErrors.email}</p>}
                         <input
                             type="text"
                             name="email"
@@ -88,9 +95,9 @@ function App() {
                             onChange={handleChange}
                         />
                     </div>
-                    <p>{formErrors.email}</p>
                     <div className="field">
                         <label>Password</label>
+                        {isSubmit && <p>{formErrors.password}</p>}
                         <input
                             type="password"
                             name="password"
@@ -99,7 +106,6 @@ function App() {
                             onChange={handleChange}
                         />
                     </div>
-                    <p>{formErrors.password}</p>
                     <button className="fluid ui button gray">Sign Up</button>
                     <div className="sign-in-link">
                         <p className="gray">Have an account? <Link to="/login">Sign In</Link></p>
