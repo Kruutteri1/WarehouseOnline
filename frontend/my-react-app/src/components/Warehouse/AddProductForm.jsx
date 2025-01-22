@@ -78,7 +78,14 @@ const AddProductForm = ({ onSuccess }) => {
             }
         } catch (error) {
             if (error.response && error.response.data) {
-                setErrorMessage(error.response.data.message || 'An error occurred. Please try again.');
+                const errorMessages = error.response.data;
+                let errorMessage = '';
+
+                for (const [field, message] of Object.entries(errorMessages)) {
+                    errorMessage += `${field}: ${message}\n`;
+                }
+
+                setErrorMessage(errorMessage || 'An error occurred. Please try again.');
             } else {
                 console.error('Error during fetch:', error);
                 setErrorMessage('An unexpected error occurred. Please try again later.');

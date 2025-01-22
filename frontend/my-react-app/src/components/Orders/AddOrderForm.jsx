@@ -67,7 +67,7 @@ const AddOrderForm = ({ onSuccess }) => {
             formData.append('fileName', formValues.fileName);
             formData.append('image', formValues.image);
 
-            const response = await axios.post('http://localhost:5000/api/warehouse/orders/add', formData, {
+            const response = await axios.post('api/warehouse/orders/add', formData, {
                 headers: {
                     Authorization: `Bearer ${actualToken}`,
                     'Content-Type': 'multipart/form-data'
@@ -80,6 +80,13 @@ const AddOrderForm = ({ onSuccess }) => {
             }
         } catch (error) {
             if (error.response && error.response.data) {
+                const errorMessages = error.response.data;
+                let errorMessage = '';
+
+                for (const [field, message] of Object.entries(errorMessages)) {
+                    errorMessage += `${field}: ${message}\n`;
+                }
+
                 setErrorMessage(error.response.data.message || 'An error occurred. Please try again.');
             } else {
                 console.error('Error during fetch:', error);

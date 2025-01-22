@@ -22,8 +22,7 @@ const Order = () => {
     const [totalPages, setTotalPages] = useState(1);
 
     const jwtToken = getCookie('jwtToken');
-    const tokenObject = JSON.parse(jwtToken);
-    const actualToken = tokenObject.token;
+    const actualToken = JSON.parse(jwtToken);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -130,9 +129,11 @@ const Order = () => {
             formDataUpdateOrder.append('deliveryDate', updatedOrder.deliveryDate);
             formDataUpdateOrder.append('orderStatus', updatedOrder.orderStatus);
             formDataUpdateOrder.append('fileName', updatedOrder.fileName);
-            formDataUpdateOrder.append('image', updatedOrder.imageFile);
+            if (updatedOrder.imageFile) {
+                formDataUpdateOrder.append('image', updatedOrder.imageFile);
+            }
 
-            const response = await axios.post('http://localhost:5000/api/warehouse/orders/update', formDataUpdateOrder, {
+            const response = await axios.post('api/warehouse/orders/update', formDataUpdateOrder, {
                 headers: {
                     Authorization: `Bearer ${actualToken}`,
                     'Content-Type': 'multipart/form-data'

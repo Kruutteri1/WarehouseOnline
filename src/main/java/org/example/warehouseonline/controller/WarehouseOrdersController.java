@@ -1,17 +1,17 @@
 package org.example.warehouseonline.controller;
 
-
-import org.example.warehouseonline.entity.WareHouseItems;
+import jakarta.validation.Valid;
+import org.example.warehouseonline.dto.AddOrderRequestDTO;
+import org.example.warehouseonline.dto.UpdateOrderRequestDTO;
 import org.example.warehouseonline.entity.WarehouseOrders;
 import org.example.warehouseonline.service.Impl.WarehouseOrdersServiceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/warehouse/orders")
@@ -41,37 +41,36 @@ public class WarehouseOrdersController {
         return warehouseOrdersService.getOrderImage(id);
     }
 
-    @PostMapping("/add")
-    @CrossOrigin(origins = "http://localhost:3000")
-    public WarehouseOrders addOrder(@RequestParam("orderId") String orderId,
-                                    @RequestParam("name") String name,
-                                    @RequestParam("quantity") int quantity,
-                                    @RequestParam("totalAmount") double totalAmount,
-                                    @RequestParam("category") String category,
-                                    @RequestParam("orderDate") String OrderDate,
-                                    @RequestParam("deliveryDate") String deliveryDate,
-                                    @RequestParam("warehouse") String warehouse,
-                                    @RequestParam("fileName") String fileName,
-                                    @RequestParam("orderStatus") String orderStatus,
-                                    @RequestParam("image") MultipartFile image) {
-        return warehouseOrdersService.addOrder(orderId, name, quantity, totalAmount, category, OrderDate, deliveryDate, warehouse, orderStatus, fileName, image);
+    @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public WarehouseOrders addOrder(@ModelAttribute @Valid AddOrderRequestDTO addOrderRequestDTO) {
+        return warehouseOrdersService.addOrder(addOrderRequestDTO.getOrderId(),
+                addOrderRequestDTO.getName(),
+                addOrderRequestDTO.getQuantity(),
+                addOrderRequestDTO.getTotalAmount(),
+                addOrderRequestDTO.getCategory(),
+                addOrderRequestDTO.getOrderDate(),
+                addOrderRequestDTO.getDeliveryDate(),
+                addOrderRequestDTO.getWarehouse(),
+                addOrderRequestDTO.getOrderStatus(),
+                addOrderRequestDTO.getFileName(),
+                addOrderRequestDTO.getImage());
     }
 
-    @PostMapping("/update")
-    @CrossOrigin(origins = "http://localhost:3000")
-    public WarehouseOrders updateOrder(@RequestParam("id") String id,
-                                       @RequestParam("orderId") String orderId,
-                                       @RequestParam("name") String name,
-                                       @RequestParam("quantity") int quantity,
-                                       @RequestParam("totalAmount") double totalAmount,
-                                       @RequestParam("category") String category,
-                                       @RequestParam("orderDate") String orderDate,
-                                       @RequestParam("deliveryDate") String deliveryDate,
-                                       @RequestParam("orderStatus") String orderStatus,
-                                       @RequestParam("warehouse") String warehouse,
-                                       @RequestParam("fileName") String fileName,
-                                       @RequestParam(value = "image", required = false) MultipartFile image) {
-        return warehouseOrdersService.updateOrder(id, orderId, name, quantity, totalAmount, category, orderDate, deliveryDate, orderStatus, warehouse, fileName, image);
+    @PostMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public WarehouseOrders updateOrder(@ModelAttribute @Valid UpdateOrderRequestDTO updateOrderRequestDTO) {
+        return warehouseOrdersService.updateOrder(updateOrderRequestDTO.getId(),
+                updateOrderRequestDTO.getOrderId(),
+                updateOrderRequestDTO.getName(),
+                updateOrderRequestDTO.getQuantity(),
+                updateOrderRequestDTO.getTotalAmount(),
+                updateOrderRequestDTO.getCategory(),
+                updateOrderRequestDTO.getOrderDate(),
+                updateOrderRequestDTO.getDeliveryDate(),
+                updateOrderRequestDTO.getOrderStatus(),
+                updateOrderRequestDTO.getWarehouse(),
+                updateOrderRequestDTO.getFileName(),
+                updateOrderRequestDTO.getImage()
+        );
     }
 
     @DeleteMapping("/delete/{orderId}")

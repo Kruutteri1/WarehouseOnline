@@ -1,13 +1,15 @@
 package org.example.warehouseonline.controller;
 
-import org.example.warehouseonline.repository.WarehouseItemsRepository;
+import jakarta.validation.Valid;
+import org.example.warehouseonline.dto.AddItemRequestDTO;
+import org.example.warehouseonline.dto.UpdateItemRequestDTO;
 import org.example.warehouseonline.entity.WareHouseItems;
 import org.example.warehouseonline.service.Impl.WarehouseItemsServiceImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/warehouse/items")
@@ -35,33 +37,33 @@ public class WarehouseItemsController {
         return warehouseItemsService.getImage(id);
     }
 
-    @PostMapping("/add")
-    public WareHouseItems addItem(@RequestParam("sku") String sku,
-                                  @RequestParam("name") String name,
-                                  @RequestParam("quantity") int quantity,
-                                  @RequestParam("price") double price,
-                                  @RequestParam("category") String category,
-                                  @RequestParam("arrivalDate") String arrivalDate,
-                                  @RequestParam("supplier") String supplier,
-                                  @RequestParam("warehouse") String warehouse,
-                                  @RequestParam("fileName") String fileName,
-                                  @RequestParam("image") MultipartFile image) {
-        return warehouseItemsService.addItem(sku, name, quantity, price, category, arrivalDate, supplier, warehouse, fileName, image);
+    @PostMapping(path = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public WareHouseItems addItem(@ModelAttribute @Valid AddItemRequestDTO addItemRequestDTO) {
+        return warehouseItemsService.addItem(addItemRequestDTO.getSku(),
+                addItemRequestDTO.getName(),
+                addItemRequestDTO.getQuantity(),
+                addItemRequestDTO.getPrice(),
+                addItemRequestDTO.getCategory(),
+                addItemRequestDTO.getArrivalDate(),
+                addItemRequestDTO.getSupplier(),
+                addItemRequestDTO.getWarehouse(),
+                addItemRequestDTO.getFileName(),
+                addItemRequestDTO.getImage());
     }
 
-    @PostMapping("/update")
-    public WareHouseItems updateItem(@RequestParam("id") String id,
-                                     @RequestParam("sku") String sku,
-                                     @RequestParam("name") String name,
-                                     @RequestParam("quantity") int quantity,
-                                     @RequestParam("price") double price,
-                                     @RequestParam("category") String category,
-                                     @RequestParam("arrivalDate") String arrivalDate,
-                                     @RequestParam("supplier") String supplier,
-                                     @RequestParam("warehouse") String warehouse,
-                                     @RequestParam("fileName") String fileName,
-                                     @RequestParam(value = "image", required = false) MultipartFile image) {
-        return warehouseItemsService.updateItem(id, sku, name, quantity, price, category, arrivalDate, supplier, warehouse, fileName, image);
+    @PostMapping(path = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public WareHouseItems updateItem(@ModelAttribute @Valid UpdateItemRequestDTO updateItemRequestDTO) {
+        return warehouseItemsService.updateItem(updateItemRequestDTO.getId(),
+                updateItemRequestDTO.getSku(),
+                updateItemRequestDTO.getName(),
+                updateItemRequestDTO.getQuantity(),
+                updateItemRequestDTO.getPrice(),
+                updateItemRequestDTO.getCategory(),
+                updateItemRequestDTO.getArrivalDate(),
+                updateItemRequestDTO.getSupplier(),
+                updateItemRequestDTO.getWarehouse(),
+                updateItemRequestDTO.getFileName(),
+                updateItemRequestDTO.getImage());
     }
 
     @DeleteMapping("/delete/{productId}")
