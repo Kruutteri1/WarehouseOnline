@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Optional;
 
 @Service
@@ -77,7 +78,7 @@ public class WarehouseOrdersServiceImpl implements WarehouseOrdersService {
 
     @Override
     @CachePut(value = "filteredOrders", key = "#result.id")
-    public WarehouseOrders addOrder(String orderId, String name, int quantity, double totalAmount, String category, String OrderDate, String deliveryDate, String warehouse, String orderStatus, String fileName, MultipartFile image) {
+    public WarehouseOrders addOrder(String orderId, String name, Integer quantity, Double totalAmount, String category, String OrderDate, String deliveryDate, String warehouse, String orderStatus, String fileName, MultipartFile image) {
         byte[] imageData;
         try {
             imageData = image.getBytes();
@@ -93,7 +94,7 @@ public class WarehouseOrdersServiceImpl implements WarehouseOrdersService {
         newOrder.setOrderId(orderId);
         newOrder.setName(name);
         newOrder.setQuantity(quantity);
-        newOrder.setTotalAmount((int) totalAmount);
+        newOrder.setTotalAmount(totalAmount);
         newOrder.setCategory(category);
 
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -113,26 +114,58 @@ public class WarehouseOrdersServiceImpl implements WarehouseOrdersService {
 
     @Override
     @CacheEvict(value = {"filteredOrders", "orderImages"}, key = "#id")
-    public WarehouseOrders updateOrder(String id, String orderId, String name, int quantity, double totalAmount, String category, String orderDate, String deliveryDate, String orderStatus, String warehouse, String fileName, MultipartFile image) {
+    public WarehouseOrders updateOrder(String id, String orderId, String name, Integer quantity, Double totalAmount, String category, String orderDate, String deliveryDate, String orderStatus, String warehouse, String fileName, MultipartFile image) {
         Optional<WarehouseOrders> optionalItem = warehouseOrdersRepository.findById(Long.parseLong(id));
         if (optionalItem.isEmpty()) throw new RuntimeException("Item not found with id: " + id);
 
         WarehouseOrders order = optionalItem.get();
-        order.setOrderId(orderId);
-        order.setName(name);
-        order.setQuantity(quantity);
-        order.setTotalAmount((int) totalAmount);
-        order.setCategory(category);
 
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate parsedOrderDate = LocalDate.parse(orderDate, dateFormatter);
-        order.setOrderDate(parsedOrderDate);
-        LocalDate parsedDelivery_date = LocalDate.parse(deliveryDate, dateFormatter);
-        order.setDeliveryDate(parsedDelivery_date);;
+        if (StringUtils.hasText(orderId)) {
+            order.setOrderId(orderId);
+        }
 
-        order.setWarehouse(warehouse);
-        order.setOrderStatus(orderStatus);
-        order.setFileName(fileName);
+        if (StringUtils.hasText(name)) {
+            order.setName(name);
+        }
+
+        if (quantity != null) {
+            order.setQuantity(quantity);
+        }
+
+        if (totalAmount != null) {
+            order.setTotalAmount(totalAmount);
+        }
+
+        if (StringUtils.hasText(category)) {
+            order.setCategory(category);
+        }
+
+        try {
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            if (StringUtils.hasText(orderDate)) {
+                LocalDate parsedOrderDate = LocalDate.parse(orderDate, dateFormatter);
+                order.setOrderDate(parsedOrderDate);
+            }
+
+            if (StringUtils.hasText(deliveryDate)) {
+                LocalDate parsedDeliveryDate = LocalDate.parse(deliveryDate, dateFormatter);
+                order.setDeliveryDate(parsedDeliveryDate);
+            }
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid date format, please use yyyy-MM-dd");
+        }
+
+        if (StringUtils.hasText(warehouse)) {
+            order.setWarehouse(warehouse);
+        }
+
+        if (StringUtils.hasText(orderStatus)) {
+            order.setOrderStatus(orderStatus);
+        }
+
+        if (StringUtils.hasText(fileName)) {
+            order.setFileName(fileName);
+        }
 
         if (image != null && !image.isEmpty()) {
             try {
@@ -142,6 +175,7 @@ public class WarehouseOrdersServiceImpl implements WarehouseOrdersService {
                 throw new RuntimeException("Error reading an image", e);
             }
         }
+
         return warehouseOrdersRepository.save(order);
     }
 

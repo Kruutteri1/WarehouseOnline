@@ -120,7 +120,9 @@ const Warehouse = () => {
             formDataUpdateProduct.append('supplier', updatedProduct.supplier);
             formDataUpdateProduct.append('warehouse', updatedProduct.warehouse);
             formDataUpdateProduct.append('fileName', updatedProduct.fileName);
-            formDataUpdateProduct.append('image', updatedProduct.imageFile);
+            if (updatedProduct.imageFile) {
+                formDataUpdateProduct.append('image', updatedProduct.imageFile);
+            }
 
             const response = await axios.post('api/warehouse/items/update', formDataUpdateProduct, {
                 headers: {
@@ -291,18 +293,14 @@ const Warehouse = () => {
                         <div className="product-info2">
                             {editingProductId === product.id ? (
                                 <>
-                                    <button className="save-button" onClick={() => handleSaveUpdatedProduct()}>Save
-                                    </button>
+                                    <button className="save-button" onClick={() => handleSaveUpdatedProduct()}>Save</button>
                                 </>
                             ) : (
-                                <button className="edit-button"
-                                        onClick={() => handleEditProduct(product.id)}>Edit</button>
+                                <button className="edit-button" onClick={() => handleEditProduct(product.id)}>Edit</button>
                             )}
                         </div>
                         <div className="product-info2">
-                            <button className="delete-button" onClick={() => handleDeleteProduct(product.id)}>
-                                Delete
-                            </button>
+                            <button className="delete-button" onClick={() => handleDeleteProduct(product.id)}>Delete</button>
                         </div>
                     </div>
                 ))}

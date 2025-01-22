@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Optional;
 
 @Service
@@ -62,7 +63,7 @@ public class WarehouseItemsServiceImpl implements WarehouseItemsService {
 
     @Override
     @CachePut(value = "filteredItems", key = "#result.id")
-    public WareHouseItems addItem(String sku, String name, int quantity, double price, String category, String arrivalDate, String supplier, String warehouse, String fileName, MultipartFile image) {
+    public WareHouseItems addItem(String sku, String name, Integer quantity, Double price, String category, String arrivalDate, String supplier, String warehouse, String fileName, MultipartFile image) {
         byte[] imageData;
         try {
             imageData = image.getBytes();
@@ -78,7 +79,7 @@ public class WarehouseItemsServiceImpl implements WarehouseItemsService {
         newItem.setSku(sku);
         newItem.setName(name);
         newItem.setQuantity(quantity);
-        newItem.setPrice((int) price);
+        newItem.setPrice((price));
         newItem.setCategory(category);
 
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -113,36 +114,67 @@ public class WarehouseItemsServiceImpl implements WarehouseItemsService {
 
     @Override
     @CacheEvict(value = {"filteredItems", "itemImage"}, key = "#id")
-    public WareHouseItems updateItem(String id, String sku, String name, int quantity, double price, String category, String arrivalDate, String supplier, String warehouse, String fileName, MultipartFile image) {
+    public WareHouseItems updateItem(String id, String sku, String name, Integer quantity, Double price, String category, String arrivalDate, String supplier, String warehouse, String fileName, MultipartFile image) {
         Optional<WareHouseItems> optionalItem = warehouseItemsRepository.findById(Long.parseLong(id));
         if (optionalItem.isEmpty()) throw new RuntimeException("Item not found with id: " + id);
 
         WareHouseItems item = optionalItem.get();
-        item.setSku(sku);
-        item.setName(name);
-        item.setQuantity(quantity);
-        item.setPrice((int) price);
-        item.setCategory(category);
 
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate parsedArrivalDate = LocalDate.parse(arrivalDate, dateFormatter);
-        item.setArrivalDate(parsedArrivalDate);
-        LocalDateTime currentDateTime = LocalDateTime.now();
-        item.setLastUpdated(currentDateTime);
+        if (StringUtils.hasText(sku)) {
+            item.setSku(sku);
+        }
 
-        item.setSupplier(supplier);
-        item.setWarehouse(warehouse);
-        item.setFileName(fileName);
+        if (StringUtils.hasText(name)) {
+            item.setName(name);
+        }
+
+        if (quantity != null) {
+            item.setQuantity(quantity);
+        }
+
+        if (price != null) {
+            item.setPrice(price);
+        }
+
+        if (StringUtils.hasText(category)) {
+            item.setCategory(category);
+        }
+
+        if (StringUtils.hasText(arrivalDate)) {
+            try {
+                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                LocalDate parsedArrivalDate = LocalDate.parse(arrivalDate, dateFormatter);
+                item.setArrivalDate(parsedArrivalDate);
+            } catch (DateTimeParseException e) {
+                throw new RuntimeException("Invalid arrival date format. Expected format is yyyy-MM-dd: " + arrivalDate, e);
+            }
+        }
+
+        if (StringUtils.hasText(supplier)) {
+            item.setSupplier(supplier);
+        }
+
+        if (StringUtils.hasText(warehouse)) {
+            item.setWarehouse(warehouse);
+        }
+
+        if (StringUtils.hasText(fileName)) {
+            item.setFileName(fileName);
+        }
+
         if (image != null && !image.isEmpty()) {
             try {
                 byte[] imageData = image.getBytes();
                 item.setImage(imageData);
             } catch (IOException e) {
-                throw new RuntimeException("Error reading an image", e);
+                throw new RuntimeException("Error reading the image file", e);
             }
         }
+        item.setLastUpdated(LocalDateTime.now());
+
         return warehouseItemsRepository.save(item);
     }
+
 
     @Override
     @CacheEvict(value = {"filteredItems", "itemImage"}, key = "#productId")
