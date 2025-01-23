@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { getCookie } from '../../Token/Token';
 import {useNavigate} from "react-router-dom";
+import {addOrder} from "./OrderService";
 
 const AddOrderForm = ({ onSuccess }) => {
     const categories = ['Electronics', 'Clothing', 'Books', "Home Decor", "Sports & Outdoors"];
@@ -67,12 +67,7 @@ const AddOrderForm = ({ onSuccess }) => {
             formData.append('fileName', formValues.fileName);
             formData.append('image', formValues.image);
 
-            const response = await axios.post('api/warehouse/orders/add', formData, {
-                headers: {
-                    Authorization: `Bearer ${actualToken}`,
-                    'Content-Type': 'multipart/form-data'
-                },
-            });
+            const response = await addOrder(formData, actualToken);
 
             if (response.status === 200) {
                 onSuccess();

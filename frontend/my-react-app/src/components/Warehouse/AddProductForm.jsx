@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { getCookie } from '../../Token/Token';
+import React, {useState} from 'react';
+import {getCookie} from '../../Token/Token';
 import './AddProductForm.css';
 import {useNavigate} from "react-router-dom";
+import {addItem} from "./WarehouseService";
 
-const AddProductForm = ({ onSuccess }) => {
+const AddProductForm = ({onSuccess}) => {
     const categories = ['Electronics', 'Clothing', 'Books', "Home Decor", "Sports & Outdoors"];
     const warehouses = ['Main Warehouse', 'Warehouse B', 'Warehouse C'];
     const [errorMessage, setErrorMessage] = useState('');
@@ -24,13 +24,14 @@ const AddProductForm = ({ onSuccess }) => {
     });
 
     const handleChange = (event) => {
-        const { name, value } = event.target;
-        setFormValues({ ...formValues, [name]: value });
+        const {name, value} = event.target;
+        setFormValues({...formValues, [name]: value});
     };
 
     const handleImageChange = (event) => {
         const file = event.target.files[0];
-        setFormValues({ ...formValues,
+        setFormValues({
+            ...formValues,
             fileName: file ? file.name : '',
             image: file
         });
@@ -65,12 +66,7 @@ const AddProductForm = ({ onSuccess }) => {
             formData.append('fileName', formValues.fileName);
             formData.append('image', formValues.image);
 
-            const response = await axios.post('api/warehouse/items/add', formData, {
-                headers: {
-                    Authorization: `Bearer ${actualToken}`,
-                    'Content-Type': 'multipart/form-data'
-                },
-            });
+            const response = await addItem(formData, actualToken);
 
             if (response.status === 200) {
                 onSuccess();

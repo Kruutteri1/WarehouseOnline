@@ -133,13 +133,15 @@ label {
 .pagination {
     display: flex;
     justify-content: center;
+    align-items: center;
     margin: 20px 0;
     font-family: Arial, sans-serif;
+    gap: 10px;
 }
 
 .pagination button {
-    padding: 10px 16px;
-    margin: 0 10px;
+    width: 280px;
+    height: 45px;
     border: none;
     border-radius: 5px;
     background: linear-gradient(135deg, #17a2b8, #20c997);
@@ -149,6 +151,7 @@ label {
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
 
 .pagination button:hover {
@@ -165,13 +168,16 @@ label {
 }
 
 .pagination span {
-    padding: 10px 16px;
+    width: 140px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     font-size: 14px;
     font-weight: bold;
     color: #495057;
     background-color: #f8f9fa;
     border-radius: 5px;
-    margin: 0 6px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
