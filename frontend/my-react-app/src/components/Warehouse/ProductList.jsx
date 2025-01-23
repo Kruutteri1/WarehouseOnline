@@ -15,7 +15,6 @@ const ProductList = ({
                      }) => {
     return (
         <div className="product-container">
-
             <div className="product-grid">
                 <div className="product-info">Image</div>
                 <div className="product-info">Sku</div>

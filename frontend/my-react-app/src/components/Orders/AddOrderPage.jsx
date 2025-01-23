@@ -4,7 +4,7 @@ import AddOrderForm from "./AddOrderForm";
 const AddOrderPage = () => {
     return (
         <div className="add-order-page">
-            <AddOrderForm onSuccess={() => alert("Product added successfully!")} />
+            <AddOrderForm onSuccess={() => alert("Order added successfully!")} />
         </div>
     );
 };

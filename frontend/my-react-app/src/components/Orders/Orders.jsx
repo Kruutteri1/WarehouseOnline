@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './Orders.css';
 import { getCookie } from "../../Token/Token"
-import axios from "axios";
-import EditableField from "../Warehouse/EditableField";
-import {Link} from "react-router-dom";
-import OrderImageLoader from "../Orders/OrderImageLoader";
+import OrderFilters from "./OrderFilters";
+import OrderList from "./OrderList";
+import {deleteOrder, getOrders, updateOrder} from "./OrderService";
 
 const warehouses = ['Main Warehouse', 'Warehouse B', 'Warehouse C'];
 const categories = ['Electronics', 'Clothing', 'Books', "Home Decor", "Sports & Outdoors"];
@@ -27,19 +26,7 @@ const Order = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('api/warehouse/orders', {
-                    params: {
-                        page: currentPage,
-                        size: 10,
-                        warehouse: selectedWarehouse,
-                        category: selectedCategory,
-                        status: selectedStatus,
-                        filter: filter,
-                    },
-                    headers: {
-                        Authorization: `Bearer ${actualToken}`,
-                    },
-                });
+                const response = await getOrders(actualToken, selectedWarehouse, selectedCategory, selectedStatus, filter, currentPage);
 
                 if (response.status === 200) {
                     setOrders(response.data.content);
@@ -98,7 +85,6 @@ const Order = () => {
             upOrder[fieldName] = newValue;
             setUpdatedOrder(upOrder);
 
-            // Update goods on the page
             setOrders(prevOrders => {
                 return prevOrders.map(order => {
                     if (order.id === orderId) {
@@ -133,12 +119,7 @@ const Order = () => {
                 formDataUpdateOrder.append('image', updatedOrder.imageFile);
             }
 
-            const response = await axios.post('api/warehouse/orders/update', formDataUpdateOrder, {
-                headers: {
-                    Authorization: `Bearer ${actualToken}`,
-                    'Content-Type': 'multipart/form-data'
-                },
-            });
+            const response = await updateOrder(formDataUpdateOrder, actualToken);
 
             if (response.status === 200) {
                 console.log(response.status);
@@ -152,11 +133,7 @@ const Order = () => {
 
     const handleDeleteOrder= async (orderId) => {
         try {
-            const response = await axios.delete(`api/warehouse/orders/delete/${orderId}`, {
-                headers: {
-                    Authorization: `Bearer ${actualToken}`
-                }
-            });
+            const response = await deleteOrder(orderId, actualToken);
 
             if (response.status === 200) {
                 console.log(`Order with ID ${orderId} has been successfully deleted.`);
@@ -171,173 +148,33 @@ const Order = () => {
 
     return (
         <div>
-            <header>
-                <h1>Warehouse Order Management System</h1>
-                <div className="filter-section">
-                    <label>Warehouse:</label>
-                    <select value={selectedWarehouse} onChange={handleWarehouseChange}>
-                        <option value="">Select Warehouse</option>
-                        {warehouses.map((warehouse, index) => (
-                            <option key={index} value={warehouse}>
-                                {warehouse}
-                            </option>
-                        ))}
-                    </select>
+            <OrderFilters
+                warehouses={warehouses}
+                categories={categories}
+                statuses={statuses}
+                selectedWarehouse={selectedWarehouse}
+                selectedCategory={selectedCategory}
+                selectedStatus={selectedStatus}
+                filter={filter}
+                handleWarehouseChange={handleWarehouseChange}
+                handleCategoryChange={handleCategoryChange}
+                handleStatusChange={handleStatusChange}
+                handleFilterChange={handleFilterChange}
+            />
 
-                    <label>Category:</label>
-                    <select value={selectedCategory} onChange={handleCategoryChange}>
-                        <option value="">Select Category</option>
-                        {categories.map((category, index) => (
-                            <option key={index} value={category}>
-                                {category}
-                            </option>
-                        ))}
-                    </select>
+            <OrderList
+                orders={orders}
+                editingOrderId={editingOrderId}
+                handleEditOrder={handleEditOrder}
+                handleSaveOrderChanges={handleSaveOrderChanges}
+                handleSaveUpdatedOrder={handleSaveUpdatedOrder}
+                handleDeleteOrder={handleDeleteOrder}
+                categories={categories}
+                warehouses={warehouses}
+                statuses={statuses}
+                actualToken={actualToken}
+            />
 
-                    <label>Status:</label>
-                    <select value={selectedStatus} onChange={handleStatusChange}>
-                        <option value="">Select Status</option>
-                        {statuses.map((status, index) => (
-                            <option key={index} value={status}>
-                                {status}
-                            </option>
-                        ))}
-                    </select>
-
-                    <label>Filter:</label>
-                    <input type="text" value={filter} onChange={handleFilterChange}/>
-                    <Link to="/add-order">
-                        <button className="add-order-button">Add Order</button>
-                    </Link>
-                </div>
-            </header>
-
-            <div className="order-grid">
-                <div className="order-info">Image</div>
-                <div className="order-info">Order id</div>
-                <div className="order-info">Name</div>
-                <div className="order-info">Quantity</div>
-                <div className="order-info">Total Amount (UAH)</div>
-                <div className="order-info">Category</div>
-                <div className="order-info">OrderDate</div>
-                <div className="order-info">Warehouse</div>
-                <div className="order-info">Delivery Date</div>
-                <div className="order-info">Status</div>
-            </div>
-
-            <div className="order-container">
-                {orders.map(order => (
-                    <div key={order.id} className="order-grid">
-                        <OrderImageLoader
-                            orderId={order.id}
-                            alt={order.fileName}
-                            actualToken={actualToken}
-                            isEditing={editingOrderId === order.id}
-                            handleSaveOrderChanges={handleSaveOrderChanges}
-                        />
-                        {editingOrderId === order.id ? (
-                            <>
-                                <EditableField
-                                    value={order.orderId}
-                                    onChange={(newValue) => handleSaveOrderChanges(order.id, 'orderId', newValue)}
-                                    className="order-info2"
-                                />
-                                <EditableField
-                                    value={order.name}
-                                    onChange={(newValue) => handleSaveOrderChanges(order.id, 'name', newValue)}
-                                    className="order-info2"
-                                />
-                                <EditableField
-                                    value={order.quantity}
-                                    onChange={(newValue) => handleSaveOrderChanges(order.id, 'quantity', newValue)}
-                                    className="order-info2"
-                                />
-                                <EditableField
-                                    value={order.totalAmount}
-                                    onChange={(newValue) => handleSaveOrderChanges(order.id, 'totalAmount', newValue)}
-                                    className="order-info2"
-                                />
-                                <select
-                                    className="order-info2"
-                                    value={order.category}
-                                    onChange={(e) => handleSaveOrderChanges(order.id, 'category', e.target.value)}
-                                >
-                                    <option value="">Select Category</option>
-                                    {categories.map((category, index) => (
-                                        <option key={index} value={category}>
-                                            {category}
-                                        </option>
-                                    ))}
-                                </select>
-                                <input
-                                    type="date"
-                                    value={order.orderDate.substring(0, 10)}
-                                    onChange={(e) => handleSaveOrderChanges(order.id, 'orderDate', e.target.value)}
-                                    className="order-info2"
-                                />
-                                <select
-                                    className="order-info2"
-                                    value={order.warehouse}
-                                    onChange={(e) => handleSaveOrderChanges(order.id, 'warehouse', e.target.value)}
-                                >
-                                    <option value="">Select Warehouse</option>
-                                    {warehouses.map((warehouse, index) => (
-                                        <option key={index} value={warehouse}>
-                                            {warehouse}
-                                        </option>
-                                    ))}
-                                </select>
-                                <input
-                                    type="date"
-                                    value={order.deliveryDate.substring(0, 10)}
-                                    onChange={(e) => handleSaveOrderChanges(order.id, 'deliveryDate', e.target.value)}
-                                    className="order-info2"
-                                />
-                                <select
-                                    className="order-info2"
-                                    value={order.orderStatus}
-                                    onChange={(e) => handleSaveOrderChanges(order.id, 'orderStatus', e.target.value)}
-                                >
-                                    <option value="">Select Status</option>
-                                    {statuses.map((status, index) => (
-                                        <option key={index} value={status}>
-                                            {status}
-                                        </option>
-                                    ))}
-                                </select>
-
-                            </>
-                        ) : (
-                            <>
-                                <div className="order-info2">{order.orderId}</div>
-                                <div className="order-info2">{order.name}</div>
-                                <div className="order-info2">{order.quantity}</div>
-                                <div className="order-info2">{order.totalAmount}</div>
-                                <div className="order-info2">{order.category}</div>
-                                <div className="order-info2">{order.orderDate}</div>
-                                <div className="order-info2">{order.warehouse}</div>
-                                <div className="order-info2">{order.deliveryDate}</div>
-                                <div className="order-info2">{order.orderStatus}</div>
-                            </>
-                        )}
-
-                        <div className="order-info2">
-                            {editingOrderId === order.id ? (
-                                <>
-                                    <button className="save-button" onClick={() => handleSaveUpdatedOrder()}>Save
-                                    </button>
-                                </>
-                            ) : (
-                                <button className="edit-button" onClick={() => handleEditOrder(order.id)}>Edit</button>
-                            )}
-                        </div>
-                        <div className="order-info2">
-                            <button className="delete-button" onClick={() => handleDeleteOrder(order.id)}>Delete
-                            </button>
-                        </div>
-                    </div>
-                ))}
-            </div>
             <div className="pagination">
                 <button onClick={handlePreviousPage} disabled={currentPage === 0}>
                     Previous
